@@ -2,6 +2,37 @@
 
 **Ansvarig:** Johan (JLiljeblad99)
 
+## 🚀 Så kör du prototypen
+
+### Alternativ 1: Öppna den direkt i webbläsaren (enklast)
+
+👉 **[prototypjohan.streamlit.app](https://prototypjohan.streamlit.app)**
+
+Du behöver inte installera något. Om sidan har "somnat" klickar du på knappen som väcker den och väntar ungefär 30 sekunder.
+
+### Alternativ 2: Kör den på din egen dator
+
+1. Hämta projektet och gå till projektmappen (mappen ovanför den här):
+   ```bash
+   git clone https://github.com/JLiljeblad99/Grupparbete-Python.git
+   cd Grupparbete-Python
+   ```
+   Har du redan projektet räcker det att skriva `git pull` i projektmappen.
+2. Installera paketen (behövs bara första gången):
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Starta prototypen:
+   ```bash
+   streamlit run johan_geografi_kunder_betalning/geografi_kunder_betalning_prototyp_app.py
+   ```
+4. Sidan öppnas i webbläsaren på http://localhost:8501. Stäng av den med `Ctrl + C` i terminalen.
+
+**På Mac:** skriv `pip3` i stället för `pip`, och `python3 -m streamlit run …` om kommandot `streamlit` inte hittas.<br>
+**På Windows:** skriv `py -m pip install -r requirements.txt` och `py -m streamlit run …`.
+
+---
+
 Den här delen av projektet tittar på **var** vi säljer, **vem** som köper och **hur** kunderna betalar.
 
 ## Filerna i den här mappen
@@ -13,22 +44,15 @@ Den här delen av projektet tittar på **var** vi säljer, **vem** som köper oc
 | [`geografi_kunder_betalning_prototyp_app.py`](geografi_kunder_betalning_prototyp_app.py) | **Prototypen (dashboarden).** En interaktiv webbsida där man själv kan välja period, jämföra perioder, filtrera och utforska en världskarta. |
 | [`.streamlit/config.toml`](.streamlit/config.toml) | **Färgtemat** (mörkt med blå detaljer) för prototypen. Gäller bara den här appen. |
 
-## Så kör du filerna
+## Så kör du analysen
 
-Kör kommandona från projektmappen (mappen ovanför den här):
+Analysen är en vanlig Python-fil som skriver ut tabellerna i terminalen. Kör den från projektmappen (efter steg 1–2 ovan):
 
 ```bash
-# Installera paketen (behövs bara en gång)
-pip install -r requirements.txt
-
-# Analysen: skriver ut tabellerna i terminalen
 python johan_geografi_kunder_betalning/geografi_kunder_betalning_analys.py
-
-# Prototypen: öppnar dashboarden i webbläsaren
-streamlit run johan_geografi_kunder_betalning/geografi_kunder_betalning_prototyp_app.py
 ```
 
-På Windows skriver man `py` i stället för `python` och `py -m streamlit run` i stället för `streamlit run`.
+På Mac skriver man `python3` och på Windows `py` i stället för `python`.
 
 Analysen skriver först ut en översikt (två tabeller) och sedan en tabell för varje fråga nedan.
 
