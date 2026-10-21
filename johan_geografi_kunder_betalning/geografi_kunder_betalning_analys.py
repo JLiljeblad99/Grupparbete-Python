@@ -10,17 +10,19 @@ Sedan svarar programmet på fyra frågor:
   3. Köper man olika saker i olika delar av världen?
   4. Betalar man på olika sätt i olika delar av världen?
 
-Förklaring av resultaten finns i geografi_kunder_betalning_README.md.
+Förklaring av resultaten finns i README.md i samma mapp.
 
-Kör från projektmappen:  python geografi_kunder_betalning.py
+Kör från projektmappen:
+    python johan_geografi_kunder_betalning/geografi_kunder_betalning_analys.py
 """
 from pathlib import Path   # hjälper till att hitta filer på datorn
 
 import pandas as pd        # verktyget vi använder för att läsa och räkna på datan
 
 # Här ligger datan vi analyserar: filen global_ecommerce_sales.csv i mappen archive.
-# Path(__file__).parent betyder "samma mapp som det här programmet ligger i".
-CSV_FIL = Path(__file__).parent / "archive" / "global_ecommerce_sales.csv"
+# Path(__file__).parent är mappen det här programmet ligger i (johan_geografi_kunder_betalning),
+# och .parent en gång till går upp till projektmappen, där mappen archive finns.
+CSV_FIL = Path(__file__).parent.parent / "archive" / "global_ecommerce_sales.csv"
 
 
 def las_data():

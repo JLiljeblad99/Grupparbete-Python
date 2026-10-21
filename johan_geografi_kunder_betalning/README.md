@@ -1,17 +1,72 @@
 # 🌍 Geografi, kunder och betalning
 
+**Ansvarig:** Johan (JLiljeblad99)
+
+## 🚀 Så kör du prototypen
+
+### Alternativ 1: Öppna den direkt i webbläsaren (enklast)
+
+👉 **[prototypjohan.streamlit.app](https://prototypjohan.streamlit.app)**
+
+Du behöver inte installera något. Om sidan har "somnat" klickar du på knappen som väcker den och väntar ungefär 30 sekunder.
+
+### Alternativ 2: Kör den på din egen dator
+
+1. Hämta projektet och gå till projektmappen (mappen ovanför den här):
+   ```bash
+   git clone https://github.com/JLiljeblad99/Grupparbete-Python.git
+   cd Grupparbete-Python
+   ```
+   Har du redan projektet räcker det att skriva `git pull` i projektmappen.
+2. Installera paketen (behövs bara första gången):
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Starta prototypen:
+   ```bash
+   streamlit run johan_geografi_kunder_betalning/geografi_kunder_betalning_prototyp_app.py
+   ```
+4. Sidan öppnas i webbläsaren på http://localhost:8501. Stäng av den med `Ctrl + C` i terminalen.
+
+**På Mac:** skriv `pip3` i stället för `pip`, och `python3 -m streamlit run …` om kommandot `streamlit` inte hittas.<br>
+**På Windows:** skriv `py -m pip install -r requirements.txt` och `py -m streamlit run …`.
+
+---
+
 Den här delen av projektet tittar på **var** vi säljer, **vem** som köper och **hur** kunderna betalar.
 
-Programmet som räknar fram allt heter [`geografi_kunder_betalning.py`](geografi_kunder_betalning.py).
+## Filerna i den här mappen
 
-## Så kör du programmet
+| Fil | Vad den är till för |
+|---|---|
+| [`README.md`](README.md) | Den här filen. Förklarar resultaten med enkla ord. |
+| [`geografi_kunder_betalning_analys.py`](geografi_kunder_betalning_analys.py) | **Analysen.** Räknar fram alla siffror och skriver ut dem som tabeller i terminalen. |
+| [`geografi_kunder_betalning_prototyp_app.py`](geografi_kunder_betalning_prototyp_app.py) | **Prototypen (dashboarden).** En interaktiv webbsida där man själv kan välja period, jämföra perioder, filtrera och utforska en världskarta. |
+| [`.streamlit/config.toml`](.streamlit/config.toml) | **Färgtemat** (mörkt med blå detaljer) för prototypen. Gäller bara den här appen. |
+
+## Så kör du analysen
+
+Analysen är en vanlig Python-fil som skriver ut tabellerna i terminalen. Kör den från projektmappen (efter steg 1–2 ovan):
 
 ```bash
-pip install -r requirements.txt
-python geografi_kunder_betalning.py
+python johan_geografi_kunder_betalning/geografi_kunder_betalning_analys.py
 ```
 
-Programmet skriver först ut en översikt (två tabeller) och sedan en tabell för varje fråga nedan.
+På Mac skriver man `python3` och på Windows `py` i stället för `python`.
+
+Analysen skriver först ut en översikt (två tabeller) och sedan en tabell för varje fråga nedan.
+
+## Vad kan man göra i prototypen?
+
+- **📅 Datum:** välj period med snabbval (t.ex. *Senaste 90 dagarna*) eller i en kalender, och jämför med *föregående period* eller *samma period förra året*, som i Google Ads.
+- **🎛️ Filter:** välj region och kundgrupp. Allt på sidan räknas om direkt.
+- **📈 Utveckling över tid:** försäljning, vinst eller ordrar i perioden, med jämförelseperioden som en streckad linje.
+- **🗺️ Världskarta:** se försäljning, vinst, marginal eller förändring per land. Klicka på ett land för att se dess profil.
+- **🔍 Sök land:** allt om ett land, jämfört med snittet.
+- **🧪 Tänk om …:** en prognos som visar hur mycket mer vi hade tjänat med ett tak för rabatterna.
+- **Våra fyra frågor:** svaren nedan, som interaktiva diagram.
+
+I prototypen visas beloppen i **amerikanska dollar (USD)**. Datan anger ingen valuta, och dollar är det mest rimliga för en global webbutik.
 
 ## Ord som är bra att känna till
 
@@ -20,10 +75,10 @@ Programmet skriver först ut en översikt (två tabeller) och sedan en tabell f�
 | **Försäljning** | Hur mycket kunderna har betalat för det de köpt. |
 | **Vinst** | Det som blir kvar till företaget när kostnaderna är betalda. |
 | **Vinstmarginal** | Hur stor del av försäljningen som blir vinst. 30 % betyder att vi tjänar 30 av varje 100 vi säljer för. |
-| **Kundgrupp** | Vilken sorts kund det är: **Consumer** (privatperson), **Corporate** (företag) eller **Home Office** (person som jobbar hemifrån). |
+| **Kundgrupp** | Vilken sorts kund det är: **Consumer** (privatperson), **Corporate** (företag) eller **Home Office** (småföretag och folk som driver firma hemifrån – kallas **Småföretag** i prototypen). |
 | **Region** | En del av världen, till exempel Europa eller Nordamerika. |
 
-Datan säger inte vilken valuta det är, så belopp står utan valuta.
+Datan säger inte vilken valuta det är, så i analysen står beloppen utan valuta (i prototypen antar vi USD).
 
 ---
 
@@ -49,7 +104,7 @@ Innan vi går in på frågorna tittar vi på helheten: vilka delar av världen o
 |---|---|---|---|---|---|---|
 | **Privatpersoner (Consumer)** | 1 006 | **256 288** | **87 300** | **53 %** | **55 %** | **34,1 %** |
 | Företag (Corporate) | 623 | 146 050 | 44 463 | 30 % | 28 % | 30,4 % |
-| Hemmakontor (Home Office) | 371 | 82 221 | 27 109 | 17 % | 17 % | 33,0 % |
+| Småföretag (Home Office) | 371 | 82 221 | 27 109 | 17 % | 17 % | 33,0 % |
 
 **Svar:** **Privatpersoner** är klart viktigast. De står för över hälften av både försäljningen och vinsten och har bäst vinstmarginal. Företagen står för 30 % av försäljningen men bara 28 % av vinsten. Varför det är så tar vi reda på i fråga 1.
 
@@ -62,7 +117,7 @@ Företagskunderna (**Corporate**) ger oss lägst vinstmarginal. Vi ville veta va
 | Kundgrupp | Ordrar | Rabatt i snitt | Ordrar med mer än 10 % rabatt | Vinstmarginal |
 |---|---|---|---|---|
 | Privatpersoner (Consumer) | 1 006 | 7,2 % | 22 % | **34,1 %** |
-| Hemmakontor (Home Office) | 371 | 7,8 % | 25 % | 33,0 % |
+| Småföretag (Home Office) | 371 | 7,8 % | 25 % | 33,0 % |
 | **Företag (Corporate)** | 623 | **11,3 %** | **41 %** | **30,4 %** |
 
 **Svar:** Företagen får **större rabatter**. Ungefär 4 av 10 företagsordrar har mer än 10 % rabatt. För privatpersoner är det bara 2 av 10. När vi ger mer rabatt blir det mindre kvar i vinst.
