@@ -11,6 +11,14 @@ python analys.py
 
 Skriptet [`analys.py`](analys.py) läser in datan med pandas, räknar ut alla nyckeltal och skriver ut sammanställningarna nedan.
 
+### Interaktiv KPI-dashboard
+
+```bash
+streamlit run app.py
+```
+
+[`app.py`](app.py) öppnar en dashboard i webbläsaren (http://localhost:8501) med filter för datum, region, land, kategori, produkt och kundsegment. Tio KPI-kort och diagram räknas om direkt när filtren ändras.
+
 ---
 
 ## 1. Översikt av projektet
