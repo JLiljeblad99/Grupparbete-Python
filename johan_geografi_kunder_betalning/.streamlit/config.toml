@@ -1,0 +1,12 @@
+# Gemensamt färgtema för alla Streamlit-appar i projektet.
+# Mörkt tema med blå detaljer, så att knappar, filter och flikar passar ihop med diagrammens färger.
+[theme]
+base = "dark"
+primaryColor = "#3987e5"
+backgroundColor = "#0b0e14"
+secondaryBackgroundColor = "#151a23"
+textColor = "#e8eaf0"
+
+[theme.sidebar]
+backgroundColor = "#0f131b"
+secondaryBackgroundColor = "#1a202b"
