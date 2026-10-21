@@ -21,6 +21,10 @@ streamlit run app.py
 
 ### Geografi, kunder & betalning (Johan)
 
+👉 **Öppna prototypen direkt i webbläsaren: [prototypjohan.streamlit.app](https://prototypjohan.streamlit.app)**
+
+Eller kör den på din egen dator:
+
 ```bash
 streamlit run johan_geografi_kunder_betalning/geografi_kunder_betalning_prototyp_app.py
 ```
