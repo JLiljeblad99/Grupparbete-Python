@@ -19,6 +19,14 @@ streamlit run app.py
 
 [`app.py`](app.py) öppnar en dashboard i webbläsaren (http://localhost:8501) med filter för datum, region, land, kategori, produkt och kundsegment. Tio KPI-kort och diagram räknas om direkt när filtren ändras.
 
+### Geografi, kunder & betalning (Johan)
+
+```bash
+streamlit run johan_geografi_kunder_betalning/geografi_kunder_betalning_prototyp_app.py
+```
+
+Mappen [`johan_geografi_kunder_betalning/`](johan_geografi_kunder_betalning/) innehåller analysen, en prototyp-dashboard med världskarta och periodjämförelse, och en [README](johan_geografi_kunder_betalning/README.md) som förklarar resultaten.
+
 ---
 
 ## 1. Översikt av projektet
