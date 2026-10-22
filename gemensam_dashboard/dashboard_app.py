@@ -466,7 +466,7 @@ LAND_TILL_REGION = dict(zip(alla["Land"], alla["Region"]))   # t.ex. "USA" -> "N
 # Filtren finns i två uppsättningar:
 #   - utkastet (datumväljaren och "utkast_..."): det man håller på att välja i panelen till vänster
 #   - det som gäller ("vald_..." och "filter_..."): det som sidan faktiskt visar
-# Utkastet börjar gälla först när man klickar på Apply. En tom lista betyder "alla".
+# Utkastet börjar gälla först när man klickar på Uppdatera. En tom lista betyder "alla".
 STANDARD = {
     "snabbval": STANDARD_SNABBVAL, "period_datum": STANDARD_PERIOD, "jamfor_pa": False,
     "jamfor_val": STANDARD_JAMFOR, "jamfor_datum": jamforelse_for(STANDARD_JAMFOR, STANDARD_PERIOD),
@@ -530,12 +530,12 @@ def satt_land(namn, typ):
 
 
 def nar_land_valjs():
-    # Man valde ett land i listan i panelen. Det börjar gälla när man klickar på Apply.
+    # Man valde ett land i listan i panelen. Det börjar gälla när man klickar på Uppdatera.
     satt_land(st.session_state["utkast_land"], "utkast")
 
 
 def tillampa():
-    # Körs när man klickar på Apply: allt man har valt i panelen börjar gälla på hela sidan
+    # Körs när man klickar på Uppdatera: allt man har valt i panelen börjar gälla på hela sidan
     per = utkast_period()
     st.session_state["vald_period"], st.session_state["vald_jamforelse"] = per, utkast_jamforelse(per)
     for namn in FILTER:
@@ -548,7 +548,7 @@ def tillampa():
 
 
 def har_vantande_andringar():
-    # True om man har ändrat något i panelen som inte gäller än (då behöver man klicka på Apply)
+    # True om man har ändrat något i panelen som inte gäller än (då behöver man klicka på Uppdatera)
     def samma(namn):
         utkast, galler = st.session_state[f"utkast_{namn}"], st.session_state[f"filter_{namn}"]
         if namn == "land":
@@ -562,7 +562,7 @@ def har_vantande_andringar():
 
 def aterstall():
     # Körs när man klickar på "Återställ allt": hela perioden och alla regioner, länder, kundgrupper
-    # och kategorier. Det gäller direkt, utan att man behöver klicka på Apply.
+    # och kategorier. Det gäller direkt, utan att man behöver klicka på Uppdatera.
     for nyckel in list(STANDARD) + ["utkast_regioner_fore_land", "filter_regioner_fore_land", "tid_matt",
                                     "kategori_matt", "produkt_matt", "karta_matt", "grupp_matt", "betal_matt",
                                     "produkt_sortering"]:
@@ -616,7 +616,7 @@ with st.sidebar:
                               max_value=SISTA_DAG, format="YYYY-MM-DD",
                               on_change=nar_jamfor_kalendern_andras, label_visibility="collapsed")
         st.caption(f"Datan går från {datum_text(FORSTA_DAG)} till {datum_text(SISTA_DAG)}. "
-                   "Klicka på **Apply** i panelen när du är klar, så uppdateras sidan.")
+                   "Klicka på **Uppdatera** i panelen när du är klar.")
 
     # Varna om en märkbar del (mer än 5 %) av jämförelsen ligger före datans början – då blir den
     # inte rättvis. En enstaka dag gör inget: datan börjar 2 jan 2023, så "förra året" saknar bara 1 jan.
@@ -645,11 +645,9 @@ with st.sidebar:
              "**Småföretag** = små företag och folk som driver firma hemifrån (heter \"Home Office\" i datan).")
     st.multiselect("🛒 Kategori", ALLA_NAMN["kategori"], key="utkast_kategori", placeholder="Alla kategorier")
 
-    # Apply: allt man har valt ovanför börjar gälla. Knappen lyser blått när det finns något att tillämpa.
+    # Uppdatera: allt man har valt ovanför börjar gälla. Knappen lyser blått när det finns något att tillämpa.
     vantar = har_vantande_andringar()
-    if vantar:
-        st.info("Du har ändrat något som inte gäller än. Klicka på **Apply** för att uppdatera sidan.", icon="✏️")
-    st.button("✓ Apply", on_click=tillampa, type="primary" if vantar else "secondary", width="stretch")
+    st.button("✓ Uppdatera", on_click=tillampa, type="primary" if vantar else "secondary", width="stretch")
     st.button("↺ Återställ allt", on_click=aterstall, width="stretch",
               help="Hela perioden och alla regioner, länder, kundgrupper och kategorier. Gäller direkt.")
     st.caption("💡 Klickar du på ett land, en kundgrupp eller en kategori i ett diagram filtreras sidan direkt.")

@@ -70,9 +70,9 @@ Det mörka färgtemat och utseendet (korten och rutorna) kommer från Johans och
 - **Datum:** välj period med snabbval (t.ex. *Senaste 90 dagarna* eller *Förra året*) eller i en kalender. Från början visas **hela perioden**.
 - **Jämförelse:** slå på *⚖️ Jämför med en annan period* och välj *föregående period* eller *samma period förra året*. Då visar KPI-korten en pil med förändringen, och diagrammen visar jämförelseperioden i grått.
 - **Filter:** region, land, kundgrupp och kategori. En tom lista betyder att alla ingår, och då står det *Alla regioner*, *Alla länder*, *Alla kundgrupper* och *Alla kategorier*.
-- **✓ Apply:** ändringarna i panelen (datum, jämförelse och filter) börjar gälla först när man klickar på **Apply**. Så länge det finns ändringar som inte gäller än visas en ruta om det, och knappen lyser blått.
+- **✓ Uppdatera:** ändringarna i panelen (datum, jämförelse och filter) börjar gälla först när man klickar på **Uppdatera**. Så länge det finns ändringar som inte gäller än lyser knappen blått.
 - **Filtren och diagrammen hänger ihop:** klickar man på ett land på kartan, en kundgrupp eller en kategori i ett diagram filtreras sidan **direkt**, och filtret i panelen ändras. Klickar man igen visas alla.
-- **↺ Återställ allt** går tillbaka till hela perioden och alla regioner, länder, kundgrupper och kategorier. Det gäller direkt, utan Apply.
+- **↺ Återställ allt** går tillbaka till hela perioden och alla regioner, länder, kundgrupper och kategorier. Det gäller direkt, utan att man behöver klicka på Uppdatera.
 - **Flikarna:** vald flik syns i adressen (`?flik=…`), så man kan skicka en länk direkt till en viss flik.
 
 ### Överst på sidan
