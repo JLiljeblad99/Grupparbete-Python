@@ -259,11 +259,10 @@ def kort(ikon, titel, undertitel=""):
     return ruta
 
 
-def forklaring(vad, hur, slutsats=None):
+def forklaring(vad, slutsats=None):
     # Förklaringen under varje diagram (samma idé som i Wissams dashboard):
-    # vad diagrammet visar, hur man läser det och vad vi kan se i urvalet just nu.
-    rader = [f'<div><span class="forklaring-etikett">ℹ️ Vad visar diagrammet?</span> {vad}</div>',
-             f'<div><span class="forklaring-etikett">👉 Så läser du det:</span> {hur}</div>']
+    # vad diagrammet visar och vad vi kan se i urvalet just nu.
+    rader = [f'<div><span class="forklaring-etikett">ℹ️ Vad visar diagrammet?</span> {vad}</div>']
     if slutsats:
         rader.append(f'<div class="forklaring-slutsats">💡 {slutsats}</div>')
     st.markdown(f'<div class="forklaring">{html_text("".join(rader))}</div>', unsafe_allow_html=True)
@@ -343,6 +342,10 @@ st.markdown(f"""
 /* Mjukare, modernare typsnitt och lite mer luft */
 html, body {{ font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }}
 .block-container {{ padding-top: 3.6rem; max-width: 1400px; }}   /* luft så att KPI-korten inte hamnar under verktygsraden */
+
+/* Sidans rubrik */
+.sidrubrik {{ font-size: 2.1rem; font-weight: 750; color: {TEXT}; letter-spacing: -0.02em; line-height: 1.2; }}
+.sidrubrik-under {{ color: {TEXT_SVAG}; font-size: 1.0rem; margin: 4px 0 18px 0; }}
 
 /* Nyckeltalskorten: mörka kort med tunn kant som lyser upp när man håller musen över */
 div[data-testid="stMetric"] {{
@@ -724,6 +727,11 @@ jmf = eller_inget(bara_landet(jmf_alla_lander))
 if jamfor_period and jmf_alla_lander is None and not df_alla_lander.empty:
     st.sidebar.warning("Det finns ingen data för jämförelseperioden. Välj en annan period.")
 
+# Sidans rubrik, högst upp ovanför KPI-korten
+st.markdown('<div class="sidrubrik">📊 E-commerce Customer Sales Dashboard</div>'
+            '<div class="sidrubrik-under">Global e-handel 2023–2025 · försäljning, produkter, kunder och betalning '
+            '· belopp i USD</div>', unsafe_allow_html=True)
+
 # Om filtren inte ger några ordrar alls: visa ett meddelande och stoppa här
 if df.empty:
     if valt_land:
@@ -955,10 +963,6 @@ def visa_trender():
                         f"({format_(serie_nu.loc[basta, tid_matt])}).")
         forklaring(
             f"Hur {tid_matt.lower()} har utvecklats i den period du valt. Varje punkt är en {STEG}.",
-            "En stigande linje betyder att det går bättre. "
-            + ("Den streckade grå linjen är jämförelseperioden, lagd ovanpå så att första dagen jämförs "
-               "med första dagen." if serie_jmf is not None else
-               "Slå på ⚖️ Jämför i panelen till vänster för att se en jämförelse som en streckad linje."),
             slutsats)
 
     # --- Försäljning och vinst per år (Alyoshs årsdiagram) ---
@@ -982,8 +986,6 @@ def visa_trender():
             slutsats = "Välj en period som täcker flera år (t.ex. <b>Hela perioden</b>) för att jämföra åren."
         forklaring(
             "Den totala försäljningen (blå) och vinsten (turkos) för varje år i perioden.",
-            "Jämför staplarna år för år. Om perioden bara täcker en del av ett år räknas bara den delen, "
-            "så välj hela år för en rättvis jämförelse.",
             slutsats)
 
 
@@ -1006,8 +1008,6 @@ def visa_produkter():
         storst, hogst = per_kategori["Försäljning"].idxmax(), per_kategori["Marginal"].idxmax()
         forklaring(
             f"{matt} för varje produktkategori.",
-            "Längst stapel = störst. Byt mellan försäljning, vinst och marginal med knapparna ovanför."
-            + (" Grå stapel = jämförelseperioden, och förändringen står inom parentes." if jmf is not None else ""),
             f"<b>{storst}</b> står för {procent(per_kategori.loc[storst, 'Försäljning'] / nu['Försäljning'] * 100)} "
             f"av försäljningen, men <b>{hogst}</b> har högst marginal ({procent(per_kategori.loc[hogst, 'Marginal'])}).")
 
@@ -1028,7 +1028,6 @@ def visa_produkter():
         visa(fig, "topp_produkter")
         forklaring(
             f"De tio produkter som har dragit in mest {matt.lower()}. Färgen visar vilken kategori produkten hör till.",
-            "Störst överst. Färgerna är samma som i kategoridiagrammet till vänster.",
             f"Etta är <b>{topp['Product_Name'].iloc[0]}</b> med {pengar(topp[matt].iloc[0])}.")
 
     # --- Produkttabellen (Alyoshs klickbara tabell) ---
@@ -1061,9 +1060,7 @@ def visa_produkter():
             },
         )
         forklaring(
-            "Alla produkter i urvalet med försäljning, vinst, marginal, antal ordrar och sålda enheter.",
-            "Staplarna i cellerna visar storleksordningen. Sortera med knapparna ovanför och klicka på en "
-            "rad för att se den produkten i diagrammet nedanför.")
+            "Alla produkter i urvalet med försäljning, vinst, marginal, antal ordrar och sålda enheter.")
 
     # --- Detaljer för vald produkt ---
     rader = vald_rad.selection.rows                     # valda radnummer (tom lista = inget valt)
@@ -1089,9 +1086,7 @@ def visa_produkter():
         svenska_datum(fig, serie.index)
         visa(fig, "produkt_tid")
         forklaring(
-            f"Försäljning (blå) och vinst (turkos) för {vald_produkt} per {STEG} i den valda perioden.",
-            "Avståndet mellan linjerna är det som går åt till kostnader. Ju närmare linjerna ligger, "
-            "desto lönsammare är produkten.")
+            f"Försäljning (blå) och vinst (turkos) för {vald_produkt} per {STEG} i den valda perioden.")
 
 
 # ===========================================================================
@@ -1164,9 +1159,6 @@ def visa_geografi():
         storst = per_land.loc[per_land["Försäljning"].idxmax()]
         forklaring(
             f"{matt} i varje land vi säljer till. Grå länder har inga ordrar i urvalet.",
-            "Ju ljusare blå, desto mer. " + ("Vid Förändring betyder blått ökning och rött minskning. "
-                                             if jmf_alla_lander is not None else "")
-            + "Håll musen över ett land för att se alla siffror.",
             f"Störst är <b>{storst['Land']}</b> med {pengar(storst['Försäljning'])} "
             f"(marginal {procent(storst['Marginal (%)'])}).")
 
@@ -1203,7 +1195,6 @@ def visa_geografi():
             slutsats = f"De tre största länderna står för <b>{procent(topp3)}</b> av försäljningen."
         forklaring(
             "De tio länder där kunderna har handlat för mest pengar. Färgen visar landets region.",
-            "Längst stapel = viktigast marknad. Håll musen över en stapel för att se marginalen.",
             slutsats)
 
     # --- Kundgrupper (klickbara) ---
@@ -1233,8 +1224,6 @@ def visa_geografi():
             {"Försäljning": "Hur mycket varje kundgrupp har köpt för.",
              "Vinstmarginal": "Hur stor del av varje kundgrupps köp som blir vinst.",
              "Stor rabatt": "Hur stor andel av varje kundgrupps ordrar som fått mer än 10 % rabatt."}[grupp_matt],
-            "Privatpersoner = vanliga konsumenter, Företag = större företag, Småföretag = små företag och "
-            "folk som driver firma hemifrån. Byt mått med knapparna ovanför.",
             f"<b>{rabatt.index[-1]}</b> får oftast stor rabatt ({procent(rabatt.iloc[-1])} av ordrarna) och har "
             f"en vinstmarginal på {procent(marginal[rabatt.index[-1]])}. Mer rabatt = mindre vinst."
             if len(rabatt) > 1 else None)
@@ -1260,7 +1249,6 @@ def visa_geografi():
         dyrast, billigast = frakt.iloc[-1], frakt.iloc[0]
         forklaring(
             "Hur stor del av försäljningen som går till frakt i varje region, och vad frakten kostar per order.",
-            "Längre stapel = dyrare frakt i förhållande till vad kunderna köper för.",
             f"I <b>{dyrast['Region']}</b> går {procent(dyrast['Andel'])} av försäljningen till frakt, mot "
             f"{procent(billigast['Andel'])} i {billigast['Region']}." if len(frakt) > 1 else None)
 
@@ -1270,7 +1258,6 @@ def visa_geografi():
         visa(fig, "produktmix")
         forklaring(
             "Hur försäljningen i varje region fördelar sig på de fyra kategorierna. Varje rad blir 100 %.",
-            "Jämför färgernas bredd mellan raderna. Bred blå del = mycket möbler.",
             f"Mest möbler köper <b>{mix['Möbler'].idxmax()}</b> ({procent(mix['Möbler'].max())}), "
             f"mest teknik <b>{mix['Teknik'].idxmax()}</b> ({procent(mix['Teknik'].max())})."
             if {"Möbler", "Teknik"} <= set(mix.columns) and len(mix) > 1 else None)
@@ -1283,36 +1270,39 @@ def visa_geografi():
 def visa_betalning():
     vanster, hoger = st.columns(2)
 
-    # --- Hur betalar man? (Johans kort) ---
-    with vanster, kort("💳", "Hur betalar kunderna?"):
-        matt = st.segmented_control("Visa", ["Andel av ordrarna", "Vinstmarginal", "Snittordervärde"],
-                                    default="Andel av ordrarna", key="betal_matt",
-                                    label_visibility="collapsed") or "Andel av ordrarna"
+    # --- Vad är varje betalsätt värt? (Johans kort) ---
+    # Hur stor andel av ordrarna som betalas på varje sätt visas i cirkeldiagrammet bredvid,
+    # så här visas bara vinstmarginal och snittordervärde.
+    with vanster, kort("💳", "Lönsamhet per betalsätt"):
+        alternativ = ["Vinstmarginal", "Snittordervärde"]
+        if st.session_state.get("betal_matt") not in alternativ + [None]:
+            st.session_state.pop("betal_matt")   # t.ex. ett gammalt val som inte finns längre
+        matt = st.segmented_control("Visa", alternativ, default="Vinstmarginal", key="betal_matt",
+                                    label_visibility="collapsed") or "Vinstmarginal"
 
         def per_betalsatt(data):
             if data is None:
                 return None
-            if matt == "Andel av ordrarna":
-                return data["Betalsätt"].value_counts(normalize=True) * 100
             grupp = data.groupby("Betalsätt")
             if matt == "Vinstmarginal":
                 return grupp["Profit"].sum() / grupp["Total_Sales"].sum() * 100
             return grupp["Total_Sales"].mean()
 
-        format_ = pengar_exakt if matt == "Snittordervärde" else procent
+        format_ = procent if matt == "Vinstmarginal" else pengar_exakt
         betal = per_betalsatt(df)
         fig = jamforelse_staplar(betal, per_betalsatt(jmf), format_, BETALSATT_FARG,
-                                 som_procentenheter=matt != "Snittordervärde", hojd=340)
+                                 som_procentenheter=matt == "Vinstmarginal", hojd=340)
         visa(fig, "betalsatt")
-        marginal = df.groupby("Betalsätt")["Profit"].sum() / df.groupby("Betalsätt")["Total_Sales"].sum() * 100
-        andel = df["Betalsätt"].value_counts(normalize=True) * 100
+        if matt == "Vinstmarginal":
+            slutsats = (f"Skillnaden i marginal mellan betalsätten är bara {tal(betal.max() - betal.min(), 1)} "
+                        "procentenheter, så betalsättet påverkar nästan inte vinsten.")
+        else:
+            slutsats = (f"Störst ordrar har <b>{betal.idxmax().lower()}</b> ({pengar_exakt(betal.max())}), "
+                        f"minst <b>{betal.idxmin().lower()}</b> ({pengar_exakt(betal.min())}).")
         forklaring(
-            {"Andel av ordrarna": "Hur stor del av ordrarna som betalas på varje sätt.",
-             "Vinstmarginal": "Hur stor del av försäljningen som blir vinst för varje betalsätt.",
+            {"Vinstmarginal": "Hur stor del av försäljningen som blir vinst för varje betalsätt.",
              "Snittordervärde": "Hur mycket en order är värd i genomsnitt för varje betalsätt."}[matt],
-            "Längst stapel = störst. Byt mått med knapparna ovanför.",
-            f"Skillnaden i marginal mellan betalsätten är bara {tal(marginal.max() - marginal.min(), 1)} "
-            "procentenheter, så betalsättet påverkar nästan inte vinsten." if len(andel) > 1 else None)
+            slutsats if len(betal) > 1 else None)
 
     # --- Betalsätt i den region/det land man har valt (Johans fråga 4): ett cirkeldiagram som följer filtren ---
     # Var urvalet gäller, t.ex. "Spanien", "Europa", "Europa och Sydamerika" eller "alla regioner"
@@ -1342,8 +1332,6 @@ def visa_betalning():
         andel = antal[betalsatt] / antal.sum() * 100
         forklaring(
             f"Hur ordrarna i {plats} fördelar sig på de fyra betalsätten. Hela cirkeln är 100 %.",
-            "Större del = vanligare betalsätt. Ändra region eller land i panelen för att jämföra olika delar av "
-            "världen. Håll musen över en del för att se antalet ordrar.",
             f"I {plats} betalar flest med <b>{andel.idxmax().lower()}</b> ({procent(andel.max())}), "
             f"minst med <b>{andel.idxmin().lower()}</b> ({procent(andel.min())})." if len(andel) > 1 else None)
 
@@ -1372,7 +1360,6 @@ def visa_rabatter_forlust():
         forsta, sista = per_rabatt.iloc[0], per_rabatt.iloc[-1]
         forklaring(
             "Hur många procent av försäljningen som blir vinst, beroende på hur stor rabatt kunden fick.",
-            "Lägre stapel = en mindre del av försäljningen blir vinst.",
             f"Vid {forsta['Rabatt']} rabatt är marginalen <b>{procent(forsta['Marginal'])}</b>, "
             f"vid {sista['Rabatt']} bara <b>{procent(sista['Marginal'])}</b>." if len(per_rabatt) > 1 else None)
 
@@ -1392,7 +1379,6 @@ def visa_rabatter_forlust():
         stor = (df["Discount_Percent"] > 10).groupby(df["Kundgrupp"]).mean() * 100
         forklaring(
             "Hur många ordrar som fått varje rabattnivå, uppdelat på kundgrupp.",
-            "Hög stapel = vanlig rabatt. Färgerna visar vilka kunder som fått rabatten.",
             f"<b>{stor.idxmax()}</b> får oftast mer än 10 % rabatt ({procent(stor.max())} av deras ordrar), "
             f"mot {procent(stor.min())} för {stor.idxmin().lower()}." if len(stor) > 1 else None)
 
@@ -1440,7 +1426,6 @@ def visa_rabatter_forlust():
         hur_manga = "Alla" if andel_sma == 100 else procent(andel_sma)   # "alla" låter bättre än "100,0 %"
         forklaring(
             "Hur stor andel av ordrarna som gick med förlust, uppdelat efter hur mycket ordern var värd.",
-            "Hög röd stapel = många förlustordrar i den storleken.",
             f"<b>{hur_manga}</b> av förlustordrarna är värda under $50. "
             f"Frakten tar {procent(frakt_forlust)} av beloppet på en förlustorder, mot {procent(frakt_lonsam)} "
             "på en lönsam." if sma.any() and not lonsamma.empty else None)
@@ -1458,7 +1443,6 @@ def visa_rabatter_forlust():
         visa(fig, "forlust_kategori")
         forklaring(
             "Hur stor andel av ordrarna i varje kategori som gick med förlust.",
-            "Längre stapel = fler förlustordrar. Färgerna är samma som för kategorierna i resten av dashboarden.",
             f"<b>{per_kat.index[-1]}</b> drabbas mest ({procent(per_kat.iloc[-1])} av ordrarna). Där är varorna "
             "billiga, så frakten äter upp vinsten.")
 
@@ -1506,7 +1490,6 @@ def visa_tank_om():
                      help="Ordrar där rabatten var högre än taket")
         forklaring(
             "Hur mycket vinsten hade ökat om de valda kundgrupperna aldrig fått mer rabatt än taket.",
-            "Dra i reglaget och välj kundgrupper. Siffrorna räknas om direkt.",
             f"Med max <b>{tak} % rabatt</b> för {', '.join(tak_grupper).lower() or 'ingen kundgrupp'} hade vinsten "
             f"blivit <b>{pengar(extra)} högre</b> ({tal(berorda)} ordrar påverkas). Förenkling: vi antar att kunderna "
             "hade köpt lika mycket även med lägre rabatt.")
@@ -1533,7 +1516,6 @@ def visa_tank_om():
                      help="Antal ordrar som är värda mindre än gränsen")
         forklaring(
             "Hur vinsten och antalet förlustordrar hade ändrats om små ordrar själva fick betala frakten.",
-            "Dra i reglaget för att ändra gränsen. Siffrorna räknas om direkt.",
             f"Om ordrar under <b>${grans}</b> betalade sin egen frakt hade vinsten blivit <b>{pengar(extra)} högre</b>, "
             f"och förlustordrarna hade gått från {tal(forlust_innan)} till <b>{tal(forlust_efter)}</b>. "
             "Förenkling: vi antar att kunderna hade köpt lika mycket ändå.")

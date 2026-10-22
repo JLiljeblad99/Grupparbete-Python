@@ -1,4 +1,6 @@
-# 📊 Gemensam dashboard: E-handel – hela bilden
+# 📊 E-commerce Customer Sales Dashboard
+
+*Gruppens gemensamma dashboard för e-handelsdatan.*
 
 Den här mappen är **gruppens gemensamma dashboard**. Här har vi slagit ihop våra tre separata dashboards till en enda webbsida, så att man får en komplett bild av datan på ett ställe.
 
@@ -77,7 +79,7 @@ Det mörka färgtemat och utseendet (korten och rutorna) kommer från Johans och
 
 ### Överst på sidan
 
-- **Tio KPI-kort** högst upp på sidan. När man jämför två perioder visar en pil i varje kort hur mycket nyckeltalet har ändrats. Håll musen över ⓘ för att se vad nyckeltalet betyder och siffran för jämförelseperioden.
+- **Rubriken** *E-commerce Customer Sales Dashboard* står högst upp, och direkt under den kommer **tio KPI-kort**. När man jämför två perioder visar en pil i varje kort hur mycket nyckeltalet har ändrats. Håll musen över ⓘ för att se vad nyckeltalet betyder och siffran för jämförelseperioden.
 - **🔎 Det viktigaste i urvalet:** tre kort med toppar och dalar, t.ex. bästa månaden, största marknaden och produkten som drar in minst vinst.
 
 Alla rutor och KPI-kort som står bredvid varandra är lika stora. Den största rutan i raden bestämmer höjden.
@@ -104,7 +106,7 @@ För rabatt, frakt och förlustordrar är det bra när siffran sjunker. Därför
 | 📈 **Försäljning & trender** | Utveckling över tid (försäljning, vinst, marginal eller ordrar) · Försäljning och vinst per år |
 | 🛋️ **Produkter & kategorier** | Kategorier (klickbara) · Topp 10 produkter · Tabell med alla produkter · Utvecklingen för vald produkt |
 | 🌍 **Geografi & kunder** | Världskarta (klickbar) · Länder med mest försäljning (klickbar) · Kundgrupper (klickbara) · Fraktkostnad per region · Vad köps i olika delar av världen? |
-| 💳 **Betalning** | Hur betalar kunderna? · Betalsätt i vald region eller valt land (ett cirkeldiagram som följer filtren) |
+| 💳 **Betalning** | Lönsamhet per betalsätt (vinstmarginal eller snittordervärde) · Betalsätt i vald region eller valt land (ett cirkeldiagram som följer filtren) |
 | 🏷️ **Rabatter & förlust** | Vinstmarginal per rabattnivå · Vem får rabatterna? · Förlustordrar per ordervärde · Förlustordrar per kategori · De produkter som har flest förlustordrar |
 | 🧪 **Tänk om …** | Tak för rabatten · Små ordrar betalar sin egen frakt |
 
@@ -112,10 +114,9 @@ Längst ner på sidan finns **📋 Visa urvalet som tabell**, där man också ka
 
 ### ℹ️ En förklaring under varje diagram
 
-Under varje diagram finns en ruta med tre delar:
+Under varje diagram finns en ruta med två delar:
 
 - **ℹ️ Vad visar diagrammet?** Vad diagrammet handlar om.
-- **👉 Så läser du det:** hur man tolkar diagrammet.
 - **💡 Slutsats:** vad vi ser i urvalet just nu. Den texten räknas om när man ändrar filtren.
 
 ### 🎨 Färgschema
