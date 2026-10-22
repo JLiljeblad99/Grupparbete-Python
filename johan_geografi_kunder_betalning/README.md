@@ -58,13 +58,21 @@ Analysen skriver först ut en översikt (två tabeller) och sedan en tabell för
 
 ## Vad kan man göra i prototypen?
 
-- **📅 Datum:** välj period med snabbval (t.ex. *Senaste 90 dagarna*) eller i en kalender, och jämför med *föregående period* eller *samma period förra året*, som i Google Ads.
-- **🎛️ Filter:** välj region och kundgrupp. Allt på sidan räknas om direkt.
+Allt ligger på en enda sida, uppifrån och ned:
+
+- **📅 Datum (i panelen till vänster):** välj period med snabbval (t.ex. *Senaste 90 dagarna*) eller i en kalender, och jämför med *föregående period* eller *samma period förra året*, som i Google Ads.
+- **🎛️ Filter (i panelen till vänster):** välj region, land och kundgrupp. Allt på sidan räknas om direkt. Filtren hänger ihop med diagrammen: klickar man på ett land eller en kundgrupp i ett diagram ändras filtret i panelen, och tvärtom.
+- **Nyckeltal:** försäljning, vinst, vinstmarginal, ordrar och frakt per order, med förändringen mot jämförelseperioden.
+- **🗺️ Världskarta:** **klicka på ett land så visar alla diagram bara det landet.** Klicka igen, eller på *✕ Visa alla länder*, för att se alla länder.
 - **📈 Utveckling över tid:** försäljning, vinst eller ordrar i perioden, med jämförelseperioden som en streckad linje.
-- **🗺️ Världskarta:** se försäljning, vinst, marginal eller förändring per land. Klicka på ett land för att se dess profil.
-- **🔍 Sök land:** allt om ett land, jämfört med snittet.
-- **🧪 Tänk om …:** en prognos som visar hur mycket mer vi hade tjänat med ett tak för rabatterna.
-- **Våra fyra frågor:** svaren nedan, som interaktiva diagram.
+- **🔎 Översikt i fyra kort:**
+  - 👥 *Kundgrupper:* vem som köper, och vem som får stora rabatter (fråga 1). Klicka på en kundgrupp för att filtrera.
+  - 🛋️ *Vad köps?:* andel av försäljningen per kategori (fråga 3)
+  - 💳 *Hur betalar man?:* andel av ordrarna per betalsätt (fråga 4)
+  - 🏆 *Länder med mest försäljning:* en topplista som också går att klicka på
+- **🧪 Tänk om … (längst ner):** en prognos som visar hur mycket mer vi hade tjänat med ett tak för rabatterna.
+
+Fråga 2 (frakten) syns i nyckeltalet *Frakt per order*, som ändras när man väljer ett land eller en region.
 
 I prototypen visas beloppen i **amerikanska dollar (USD)**. Datan anger ingen valuta, och dollar är det mest rimliga för en global webbutik.
 
