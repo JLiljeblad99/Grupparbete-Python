@@ -104,7 +104,7 @@ För rabatt, frakt och förlustordrar är det bra när siffran sjunker. Därför
 | 📈 **Försäljning & trender** | Utveckling över tid (försäljning, vinst, marginal eller ordrar) · Försäljning och vinst per år |
 | 🛋️ **Produkter & kategorier** | Kategorier (klickbara) · Topp 10 produkter · Tabell med alla produkter · Utvecklingen för vald produkt |
 | 🌍 **Geografi & kunder** | Världskarta (klickbar) · Länder med mest försäljning (klickbar) · Kundgrupper (klickbara) · Fraktkostnad per region · Vad köps i olika delar av världen? |
-| 💳 **Betalning** | Hur betalar kunderna? · Betalsätt i olika delar av världen (ett cirkeldiagram per region) |
+| 💳 **Betalning** | Hur betalar kunderna? · Betalsätt i vald region eller valt land (ett cirkeldiagram som följer filtren) |
 | 🏷️ **Rabatter & förlust** | Vinstmarginal per rabattnivå · Vem får rabatterna? · Förlustordrar per ordervärde · Förlustordrar per kategori · De produkter som har flest förlustordrar |
 | 🧪 **Tänk om …** | Tak för rabatten · Små ordrar betalar sin egen frakt |
 

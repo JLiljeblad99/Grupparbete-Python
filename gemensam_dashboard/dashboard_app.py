@@ -26,7 +26,6 @@ import pandas as pd                 # läser och räknar på datan
 import plotly.express as px         # gör interaktiva diagram och kartor
 import plotly.graph_objects as go   # används när diagrammen behöver byggas del för del
 import streamlit as st              # bygger webbsidan
-from plotly.subplots import make_subplots   # flera cirkeldiagram bredvid varandra
 
 # Datan ligger i mappen archive i projektmappen. Path(__file__).parent är den här mappen
 # (gemensam_dashboard), och .parent en gång till går upp till projektmappen.
@@ -1282,8 +1281,10 @@ def visa_geografi():
 # ===========================================================================
 
 def visa_betalning():
+    vanster, hoger = st.columns(2)
+
     # --- Hur betalar man? (Johans kort) ---
-    with kort("💳", "Hur betalar kunderna?"):
+    with vanster, kort("💳", "Hur betalar kunderna?"):
         matt = st.segmented_control("Visa", ["Andel av ordrarna", "Vinstmarginal", "Snittordervärde"],
                                     default="Andel av ordrarna", key="betal_matt",
                                     label_visibility="collapsed") or "Andel av ordrarna"
@@ -1301,7 +1302,7 @@ def visa_betalning():
         format_ = pengar_exakt if matt == "Snittordervärde" else procent
         betal = per_betalsatt(df)
         fig = jamforelse_staplar(betal, per_betalsatt(jmf), format_, BETALSATT_FARG,
-                                 som_procentenheter=matt != "Snittordervärde", hojd=300)
+                                 som_procentenheter=matt != "Snittordervärde", hojd=340)
         visa(fig, "betalsatt")
         marginal = df.groupby("Betalsätt")["Profit"].sum() / df.groupby("Betalsätt")["Total_Sales"].sum() * 100
         andel = df["Betalsätt"].value_counts(normalize=True) * 100
@@ -1310,40 +1311,41 @@ def visa_betalning():
              "Vinstmarginal": "Hur stor del av försäljningen som blir vinst för varje betalsätt.",
              "Snittordervärde": "Hur mycket en order är värd i genomsnitt för varje betalsätt."}[matt],
             "Längst stapel = störst. Byt mått med knapparna ovanför.",
-            f"Vanligast är <b>{andel.idxmax().lower()}</b> ({procent(andel.max())} av ordrarna). Skillnaden i "
-            f"marginal mellan betalsätten är bara {tal(marginal.max() - marginal.min(), 1)} procentenheter, "
-            "så betalsättet påverkar nästan inte vinsten." if len(andel) > 1 else None)
+            f"Skillnaden i marginal mellan betalsätten är bara {tal(marginal.max() - marginal.min(), 1)} "
+            "procentenheter, så betalsättet påverkar nästan inte vinsten." if len(andel) > 1 else None)
 
-    # --- Betalsätt per region (Johans fråga 4): ett cirkeldiagram per region ---
-    with kort("🌐", "Betalsätt i olika delar av världen"):
-        antal = pd.crosstab(df["Region"], df["Betalsätt"])          # antal ordrar per region och betalsätt
-        mix = antal.div(antal.sum(axis=1), axis=0) * 100            # samma sak i procent (varje region = 100 %)
-        regioner = [r for r in REGIONER.values() if r in antal.index]
-        betalsatt = [b for b in BETALSATT.values() if b in antal.columns]
-        fig = make_subplots(rows=1, cols=len(regioner), specs=[[{"type": "domain"}] * len(regioner)],
-                            subplot_titles=regioner, horizontal_spacing=0.02)
-        for nr, region in enumerate(regioner, start=1):
-            fig.add_trace(go.Pie(
-                labels=betalsatt, values=antal.loc[region, betalsatt], name=region, hole=0.5, sort=False,
-                direction="clockwise", marker=dict(colors=[BETALSATT_FARG[b] for b in betalsatt],
-                                                   line=dict(color="#0b0e14", width=2)),
-                texttemplate="%{percent:.0%}", textfont=dict(color="#ffffff", size=12),
-                hovertemplate=f"<b>{region}</b><br>" + "%{label}: %{percent:.1%} (%{value} ordrar)<extra></extra>"),
-                row=1, col=nr)
-        snygga_till(fig, 330)
-        # Förklaringen av färgerna under cirklarna, så att den inte krockar med regionernas namn
-        fig.update_layout(margin=dict(l=10, r=10, t=40, b=10),
-                          legend=dict(orientation="h", y=-0.05, yanchor="top", x=0.5, xanchor="center"))
-        fig.update_annotations(font=dict(color=TEXT, size=14))   # regionernas namn ovanför cirklarna
-        visa(fig, "betalsatt_region")
+    # --- Betalsätt i den region/det land man har valt (Johans fråga 4): ett cirkeldiagram som följer filtren ---
+    # Var urvalet gäller, t.ex. "Spanien", "Europa", "Europa och Sydamerika" eller "alla regioner"
+    if valt_land:
+        plats = valt_land
+    elif len(valda_regioner) == len(REGIONER):
+        plats = "alla regioner"
+    else:
+        plats = " och ".join([", ".join(valda_regioner[:-1]), valda_regioner[-1]] if len(valda_regioner) > 1
+                             else valda_regioner)
+    with hoger, kort("🌐", f"Betalsätt i {plats}",
+                     "Välj region eller land i panelen till vänster, så visar diagrammet bara det."):
+        antal = df["Betalsätt"].value_counts()
+        betalsatt = [b for b in BETALSATT.values() if b in antal.index]   # samma ordning och färger som överallt
+        fig = go.Figure(go.Pie(
+            labels=betalsatt, values=antal[betalsatt], hole=0.55, sort=False, direction="clockwise",
+            marker=dict(colors=[BETALSATT_FARG[b] for b in betalsatt], line=dict(color="#0b0e14", width=2)),
+            texttemplate="%{percent:.0%}", textfont=dict(color="#ffffff", size=14),
+            hovertemplate="%{label}: %{percent:.1%} (%{value} ordrar)<extra></extra>"))
+        snygga_till(fig, 340)
+        # Antal ordrar i mitten av cirkeln, och förklaringen av färgerna till höger
+        fig.update_layout(margin=dict(l=10, r=10, t=10, b=10),
+                          legend=dict(orientation="v", y=0.5, yanchor="middle", x=1.02, xanchor="left"),
+                          annotations=[dict(text=f"<b>{tal(antal.sum())}</b><br>ordrar", showarrow=False,
+                                            font=dict(color=TEXT, size=16), x=0.5, y=0.5, xref="paper", yref="paper")])
+        visa(fig, "betalsatt_cirkel")
+        andel = antal[betalsatt] / antal.sum() * 100
         forklaring(
-            "Hur ordrarna i varje region fördelar sig på de fyra betalsätten. Varje cirkel är en region och blir 100 %.",
-            "Jämför hur stor del av cirklarna som har samma färg. Stor blå del = många betalar med kreditkort. "
-            "Håll musen över en del för att se antalet ordrar.",
-            f"Kreditkort är vanligast i <b>{mix['Kreditkort'].idxmax()}</b> ({procent(mix['Kreditkort'].max())}), "
-            f"betala vid leverans i <b>{mix['Betala vid leverans'].idxmax()}</b> "
-            f"({procent(mix['Betala vid leverans'].max())})."
-            if {"Kreditkort", "Betala vid leverans"} <= set(mix.columns) and len(mix) > 1 else None)
+            f"Hur ordrarna i {plats} fördelar sig på de fyra betalsätten. Hela cirkeln är 100 %.",
+            "Större del = vanligare betalsätt. Ändra region eller land i panelen för att jämföra olika delar av "
+            "världen. Håll musen över en del för att se antalet ordrar.",
+            f"I {plats} betalar flest med <b>{andel.idxmax().lower()}</b> ({procent(andel.max())}), "
+            f"minst med <b>{andel.idxmin().lower()}</b> ({procent(andel.min())})." if len(andel) > 1 else None)
 
 
 # ===========================================================================
