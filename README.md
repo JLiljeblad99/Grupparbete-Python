@@ -6,18 +6,18 @@ Grupparbete i Python: analys av `archive/global_ecommerce_sales.csv`.
 
 ```bash
 pip install -r requirements.txt
-python analys.py
+python wissam_kpi_dashboard/kpi_analys.py
 ```
 
-Skriptet [`analys.py`](analys.py) läser in datan med pandas, räknar ut alla nyckeltal och skriver ut sammanställningarna nedan.
+Skriptet [`kpi_analys.py`](wissam_kpi_dashboard/kpi_analys.py) läser in datan med pandas, räknar ut alla nyckeltal och skriver ut sammanställningarna nedan.
 
-### Interaktiv KPI-dashboard
+### Interaktiv KPI-dashboard (Wissam)
 
 ```bash
-streamlit run app.py
+streamlit run wissam_kpi_dashboard/kpi_dashboard_app.py
 ```
 
-[`app.py`](app.py) öppnar en dashboard i webbläsaren (http://localhost:8501) med filter för datum, region, land, kategori, produkt och kundsegment. Tio KPI-kort och diagram räknas om direkt när filtren ändras.
+Mappen [`wissam_kpi_dashboard/`](wissam_kpi_dashboard/) innehåller en dashboard för ledningsgruppen som öppnas i webbläsaren (http://localhost:8501). Den har filter för datum, region, land, kategori, produkt och kundsegment. Tio KPI-kort och diagram räknas om direkt när filtren ändras, och varje diagram har en kort förklaring. Mer information finns i mappens [README](wissam_kpi_dashboard/README.md).
 
 ### Geografi, kunder & betalning (Johan)
 

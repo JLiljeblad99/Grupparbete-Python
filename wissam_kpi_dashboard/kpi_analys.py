@@ -1,12 +1,13 @@
 """E-handelsanalys av global_ecommerce_sales.csv.
 
-Kör från projektmappen:  python analys.py
+Kör från projektmappen:  python wissam_kpi_dashboard/kpi_analys.py
 """
 from pathlib import Path
 
 import pandas as pd
 
-CSV_FIL = Path(__file__).parent / "archive" / "global_ecommerce_sales.csv"
+# Datan ligger i projektmappen: .parent är den här mappen, .parent.parent är projektmappen
+CSV_FIL = Path(__file__).parent.parent / "archive" / "global_ecommerce_sales.csv"
 
 
 def las_data(fil=CSV_FIL):
