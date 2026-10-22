@@ -38,8 +38,7 @@ from geografi_kunder_betalning_analys import las_data
 # Fasta färger som används i hela appen. Samma sak har alltid samma färg,
 # t.ex. är Europa alltid blå, oavsett vilket diagram man tittar på.
 # Färgerna är anpassade för mörk bakgrund och går att skilja åt även för färgblinda.
-BLA, ORANGE, TURKOS, GUL, ROSA, LILA = "#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#9085e9"
-GRA = "#898781"
+BLA, ORANGE, TURKOS, GUL, GRA = "#3987e5", "#d95926", "#199e70", "#c98500", "#898781"
 
 # Diagrammens "ram": textfärg, rutnät och bakgrund till hjälprutor
 TEXT, TEXT_SVAG, RUTNAT, AXEL, KORT = "#e8eaf0", "#a3a8b4", "#232a36", "#2f3746", "#151a23"
@@ -86,9 +85,10 @@ LANDER = {
     "United Kingdom": ("Storbritannien", "GBR"), "United States": ("USA", "USA"),
 }
 MANADER = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"]
+MANADER_LANGA = ["januari", "februari", "mars", "april", "maj", "juni",
+                 "juli", "augusti", "september", "oktober", "november", "december"]
 
 # Koppla varje region, kundgrupp osv. till sin fasta färg
-REGION_FARG = dict(zip(REGIONER.values(), [BLA, ORANGE, TURKOS, GUL, ROSA]))
 KUNDGRUPP_FARG = dict(zip(KUNDGRUPPER.values(), [BLA, ORANGE, TURKOS]))
 BETALSATT_FARG = dict(zip(BETALSATT.values(), [BLA, ORANGE, TURKOS, GUL]))
 KATEGORI_FARG = dict(zip(KATEGORIER.values(), [BLA, ORANGE, TURKOS, GUL]))
@@ -132,6 +132,11 @@ def procent_andring(varde):
     return f"{varde:+.1f} %".replace(".", ",")
 
 
+def procentenheter(varde):
+    # Skillnaden mellan två procenttal: 33,1 % mot 30,4 % -> "+2,7 %-enh." (procentenheter)
+    return f"{varde:+.1f} %-enh.".replace(".", ",", 1)
+
+
 def pengar_exakt(varde):
     # Belopp med ören/cent, för små belopp: 12.345 -> "$12,35"
     return f"${varde:.2f}".replace(".", ",")
@@ -148,9 +153,7 @@ def period_text(period):
 
 def forandring(nu, forut):
     # Hur mycket något har ändrats i procent, t.ex. "+12 %". Tomt om det inte går att räkna.
-    if forut is None or forut == 0:
-        return None
-    return f"{(nu / forut - 1) * 100:+.1f} %".replace(".", ",")
+    return procent_andring((nu / forut - 1) * 100) if forut else None
 
 
 def snygga_till(fig, hojd=380, pengar_x=False, pengar_y=False):
@@ -178,18 +181,15 @@ def snygga_till(fig, hojd=380, pengar_x=False, pengar_y=False):
     return fig
 
 
-def liggande_staplar(fig, tabell, kolumn):
-    # För liggande stapeldiagram: gör plats till höger så att talen vid staplarna inte klipps av
-    fig.update_traces(textposition="outside", cliponaxis=False, showlegend=False,
-                      textfont=dict(color=TEXT, size=13), marker_cornerradius=4)
-    fig.update_xaxes(range=[0, tabell[kolumn].max() * 1.22], showgrid=False, showticklabels=False, title=None)
-    fig.update_yaxes(title=None, showgrid=False)
-    return fig
-
-
-def visa(fig):
-    # Visar ett diagram på sidan, utan Plotlys verktygsrad (enklare för användaren)
-    st.plotly_chart(fig, width="stretch", theme=None, config={"displayModeBar": False})
+def visa(fig, namn=None, vid_klick=None):
+    # Visar ett diagram på sidan, utan Plotlys verktygsrad (enklare för användaren).
+    # Med vid_klick går det att klicka i diagrammet: då körs den funktionen. Nyckeln får ett nytt
+    # nummer efter varje klick, så att diagrammet glömmer det gamla klicket.
+    klick = {}
+    if vid_klick:
+        nyckel = f"{namn}_{st.session_state['klick_nr']}"
+        klick = dict(key=nyckel, on_select=partial(vid_klick, nyckel), selection_mode="points")
+    st.plotly_chart(fig, width="stretch", theme=None, config={"displayModeBar": False}, **klick)
 
 
 def svarsruta(text):
@@ -198,9 +198,10 @@ def svarsruta(text):
                 unsafe_allow_html=True)
 
 
-def rubrik(ikon, titel, undertitel=""):
-    # En snygg avsnittsrubrik med ikon och en kort förklaring under
-    st.markdown(f'<div class="avsnitt"><span class="avsnitt-ikon">{ikon}</span>{titel}</div>'
+def rubrik(ikon, titel, undertitel="", liten=False):
+    # En snygg rubrik med ikon och en kort förklaring under. liten=True används inne i korten.
+    stil = ' style="margin-top:4px;font-size:1.1rem"' if liten else ""
+    st.markdown(f'<div class="avsnitt"{stil}><span class="avsnitt-ikon">{ikon}</span>{titel}</div>'
                 + (f'<div class="avsnitt-under">{undertitel}</div>' if undertitel else ""),
                 unsafe_allow_html=True)
 
@@ -373,7 +374,8 @@ def nar_jamfor_kalendern_andras():
 def aterstall():
     # Körs när man klickar på "Återställ": tar bort alla val så att allt visas som från början
     for nyckel in ["snabbval", "period_datum", "jamfor_pa", "jamfor_val", "jamfor_datum",
-                   "senaste_period", "senaste_jamfor", "filter_region", "filter_kundgrupp", "filter_land", "regioner_fore_land"]:
+                   "senaste_period", "senaste_jamfor", "filter_region", "filter_kundgrupp", "filter_land", "regioner_fore_land",
+                   "tid_matt", "grupp_matt"]:
         st.session_state.pop(nyckel, None)
 
 
@@ -394,11 +396,6 @@ def valj_land(namn):
         st.session_state["filter_region"] = [LAND_TILL_REGION[namn]]
     st.session_state["filter_land"] = namn
     st.session_state["klick_nr"] = st.session_state.get("klick_nr", 0) + 1   # diagrammen glömmer gamla klick
-
-
-def nar_land_valjs():
-    # Körs när man väljer ett land i listan i panelen
-    valj_land(st.session_state["filter_land"])
 
 
 def aktuell_period():
@@ -461,8 +458,9 @@ with st.sidebar:
         st.caption(f"Datan går från {datum_text(FORSTA_DAG)} till {datum_text(SISTA_DAG)}. "
                    "Allt på sidan uppdateras direkt när du ändrar något här.")
 
-    # Varna om jämförelsen börjar innan datan gör – då blir jämförelsen inte rättvis
-    if jamfor_period and jamfor_period[0] < FORSTA_DAG:
+    # Varna om en märkbar del (mer än 5 %) av jämförelsen ligger före datans början – då blir den
+    # inte rättvis. En enstaka dag gör inget: datan börjar 2 jan 2023, så "förra året" saknar bara 1 jan.
+    if jamfor_period and (FORSTA_DAG - jamfor_period[0]).days > 0.05 * ((jamfor_period[1] - jamfor_period[0]).days + 1):
         st.warning(f"Jämförelseperioden börjar före {datum_text(FORSTA_DAG)}, när datan saknas. "
                    "Jämförelsen blir därför missvisande – välj en kortare period.")
 
@@ -484,7 +482,7 @@ with st.sidebar:
         # t.ex. om man själv har valt bort landets region – då visas alla länder i regionerna man valt
         st.session_state["filter_land"] = ALLA_LANDER
         st.session_state.pop("regioner_fore_land", None)
-    st.selectbox("📍 Land", land_alternativ, key="filter_land", on_change=nar_land_valjs,
+    st.selectbox("📍 Land", land_alternativ, key="filter_land", on_change=lambda: valj_land(st.session_state["filter_land"]),
                  help="Visar länderna i de regioner du har valt. Välj ett land här, eller klicka på ett land "
                       "på kartan – de hänger ihop. Regionen ändras automatiskt till landets region.")
 
@@ -503,11 +501,15 @@ def i_period(data, per):
     return data[(data["Datum"] >= per[0]) & (data["Datum"] <= per[1])]
 
 
-# Alla länder i vald period och i jämförelseperioden – används av kartan och topplistan
+def eller_inget(data):
+    # En tom tabell blir None, så att resten av koden bara behöver kolla "is None"
+    return None if data is None or data.empty else data
+
+
+# Alla länder i vald period och i jämförelseperioden – används av kartan och topplistan.
+# Jämförelsen blir None om den är avstängd eller saknar data (t.ex. före 2023).
 df_alla_lander = i_period(bas, period)
-jmf_alla_lander = i_period(bas, jamfor_period) if jamfor_period else None
-if jmf_alla_lander is not None and jmf_alla_lander.empty:
-    jmf_alla_lander = None   # ingen data i jämförelseperioden (t.ex. före 2023)
+jmf_alla_lander = eller_inget(i_period(bas, jamfor_period)) if jamfor_period else None
 
 
 # ===========================================================================
@@ -518,16 +520,17 @@ KOD_TILL_LAND = {kod: namn for namn, kod in LANDER.values()}   # t.ex. "MEX" -> 
 st.session_state.setdefault("klick_nr", 0)
 
 
-def nar_land_klickas(nyckel, falt):
-    # Körs när man klickar på ett land på kartan (falt="location") eller i topplistan (falt="y").
+def nar_land_klickas(nyckel):
+    # Körs när man klickar på ett land på kartan (ger landskoden) eller i topplistan (ger namnet).
     # Klickar man på samma land igen tas filtret bort.
     punkter = st.session_state[nyckel]["selection"]["points"]
     if not punkter:
         return
-    varde = punkter[0].get(falt)
+    varde = punkter[0].get("location") or punkter[0].get("y")
     namn = KOD_TILL_LAND.get(varde, varde)
     # Klicket ändrar land- och region-filtret i panelen till vänster, så att de alltid visar samma sak
-    valj_land(ALLA_LANDER if st.session_state.get("filter_land") == namn else namn)
+    if namn in LAND_TILL_REGION:
+        valj_land(ALLA_LANDER if st.session_state.get("filter_land") == namn else namn)
 
 
 def nar_kundgrupp_klickas(nyckel):
@@ -543,10 +546,6 @@ def nar_kundgrupp_klickas(nyckel):
     st.session_state["klick_nr"] += 1
 
 
-def visa_alla_lander():
-    valj_land(ALLA_LANDER)
-
-
 valt_land = None if st.session_state["filter_land"] == ALLA_LANDER else st.session_state["filter_land"]
 
 
@@ -558,12 +557,10 @@ def bara_landet(data):
 
 
 df = bara_landet(df_alla_lander)    # det som alla diagram (utom kartan och topplistan) visar
-jmf = bara_landet(jmf_alla_lander)
-if jmf is not None and jmf.empty:
-    jmf = None
+jmf = eller_inget(bara_landet(jmf_alla_lander))
 
 with st.sidebar:
-    if jamfor_period and jmf_alla_lander is None:
+    if jamfor_period and jmf_alla_lander is None and not df_alla_lander.empty:
         st.warning("Det finns ingen data för jämförelseperioden. Välj en annan period.")
     st.divider()
     st.download_button("⬇️ Ladda ner urvalet (CSV)",
@@ -572,7 +569,11 @@ with st.sidebar:
 
 # Om filtren inte ger några ordrar alls: visa ett meddelande och stoppa här
 if df.empty:
-    st.warning("Inga ordrar matchar dina val. Välj minst en region och en kundgrupp, eller en längre period.")
+    if valt_land:
+        st.warning(f"{valt_land} har inga ordrar som matchar dina val. Välj en längre period eller ett annat land.")
+        st.button("✕ Visa alla länder", on_click=valj_land, args=(ALLA_LANDER,), key="alla_lander_tom")
+    else:
+        st.warning("Inga ordrar matchar dina val. Välj minst en region och en kundgrupp, eller en längre period.")
     st.stop()
 
 
@@ -581,9 +582,6 @@ if df.empty:
 # ===========================================================================
 
 # Små "etiketter" under rubriken som visar vad man har valt just nu
-chips = [f"🔵 {period_text(period)}"]
-if jmf is not None:
-    chips.append(f"⚪ Jämförs med {period_text(jamfor_period)}")
 def filter_text(valda, alla_namn, ord_):
     # "Alla kundgrupper", "Företag, Småföretag" eller "3 av 5 regioner"
     if len(valda) == len(alla_namn):
@@ -591,6 +589,9 @@ def filter_text(valda, alla_namn, ord_):
     return ", ".join(valda) if len(valda) <= 2 else f"{len(valda)} av {len(alla_namn)} {ord_}"
 
 
+chips = [f"🔵 {period_text(period)}"]
+if jmf is not None:
+    chips.append(f"⚪ Jämförs med {period_text(jamfor_period)}")
 chips += [f"📍 {valt_land}" if valt_land else "🌍 Alla länder",
           f"🗺️ {filter_text(valda_regioner, REGIONER, 'regioner')}",
           f"👥 {filter_text(valda_kundgrupper, KUNDGRUPPER, 'kundgrupper')}",
@@ -613,7 +614,8 @@ if valt_land:
     text_kolumn.markdown(f'<div class="avsnitt" style="margin-top:0">📍 {valt_land} '
                          f'<span class="avsnitt-under">· {region} · alla diagram visar bara det här landet</span></div>',
                          unsafe_allow_html=True)
-    knapp_kolumn.button("✕ Visa alla länder", on_click=visa_alla_lander, width="stretch", key="alla_lander_topp")
+    knapp_kolumn.button("✕ Visa alla länder", on_click=valj_land, args=(ALLA_LANDER,), width="stretch",
+                        key="alla_lander_topp")
 
 
 # ===========================================================================
@@ -659,7 +661,11 @@ def tidsserie(data, forskjutning=timedelta(0)):
     serie = data.assign(Punkt=punkt).groupby("Punkt").agg(
         Försäljning=("Total_Sales", "sum"), Vinst=("Profit", "sum"), Ordrar=("Order_ID", "count"),
         Frakt=("Shipping_Cost", "mean"))
-    serie = serie.reindex(steg, fill_value=0)   # dagar/veckor utan ordrar får värdet 0
+    # Dagar/veckor utan ordrar: 0 i försäljning, vinst och ordrar. Frakt per order och marginal
+    # lämnas tomma, annars ser det ut som att frakten var gratis och marginalen 0 just den dagen.
+    serie = serie.reindex(steg)
+    summor = ["Försäljning", "Vinst", "Ordrar"]
+    serie[summor] = serie[summor].fillna(0)
     serie["Marginal"] = serie["Vinst"] / serie["Försäljning"].where(serie["Försäljning"] > 0) * 100
     return serie
 
@@ -668,42 +674,36 @@ serie_nu = tidsserie(df)
 FLYTT = (start - jamfor_period[0]) if jmf is not None else timedelta(0)
 serie_jmf = tidsserie(jmf, FLYTT) if jmf is not None else None
 
-# Värdena till de små trenddiagrammen i korten
-trend = (lambda kol: serie_nu[kol].fillna(0).round(1).tolist()) if len(serie_nu) > 1 else (lambda kol: None)
+def trend(kol):
+    # Värdena till det lilla trenddiagrammet i ett kort (dagar utan ordrar hoppas över)
+    varden = serie_nu[kol].dropna().round(1).tolist()
+    return varden if len(varden) > 1 else None
 
 
-def mot(text, forklaring=""):
-    # Hjälptexten (ⓘ) på ett kort: förklaring + siffran för jämförelseperioden, t.ex. "Jämförelseperioden: $155 151".
-    # Korten är för smala för att visa jämförelsesiffran bredvid pilen, därför ligger den här.
-    delar = [forklaring] if forklaring else []
+# Ett kort per nyckeltal: (rubrik, nyckeltal, hur talet skrivs, typ av litet diagram, förklaring)
+NYCKELTAL = [
+    ("💰 Försäljning", "Försäljning", pengar, "area", ""),
+    ("📈 Vinst", "Vinst", pengar, "area", ""),
+    ("🎯 Vinstmarginal", "Marginal", procent, "line",
+     "Hur stor del av försäljningen som blir vinst. Pilen visar skillnaden i procentenheter."),
+    ("📦 Ordrar", "Ordrar", tal, "bar", ""),
+    ("🚚 Frakt per order", "Frakt", pengar_exakt, "line", "Vad det kostar i genomsnitt att skicka en order till kunden."),
+]
+for kolumn, (etikett, namn, format_, diagram, forklaring) in zip(st.columns(5), NYCKELTAL):
+    if forut is None:
+        delta = None
+    elif namn == "Marginal":
+        delta = procentenheter(nu[namn] - forut[namn])   # för marginalen visas skillnaden i procentenheter
+    else:
+        delta = forandring(nu[namn], forut[namn])
+    # Hjälptexten (ⓘ): förklaring + siffran för jämförelseperioden. Korten är för smala för att
+    # visa jämförelsesiffran bredvid pilen, därför ligger den här.
+    hjalp = [forklaring] if forklaring else []
     if forut:
-        delar.append(f"⚪ Jämförelseperioden: **{text}**")
-    return "  \n".join(delar) or None
-
-
-k1, k2, k3, k4, k5 = st.columns(5)
-k1.metric("💰 Försäljning", pengar(nu["Försäljning"]),
-          delta=forandring(nu["Försäljning"], forut and forut["Försäljning"]),
-          help=mot(forut and pengar(forut["Försäljning"])),
-          chart_data=trend("Försäljning"), chart_type="area")
-k2.metric("📈 Vinst", pengar(nu["Vinst"]),
-          delta=forandring(nu["Vinst"], forut and forut["Vinst"]),
-          help=mot(forut and pengar(forut["Vinst"])),
-          chart_data=trend("Vinst"), chart_type="area")
-k3.metric("🎯 Vinstmarginal", procent(nu["Marginal"]),
-          delta=(f"{nu['Marginal'] - forut['Marginal']:+.1f} %-enh.".replace(".", ",", 1) if forut else None),
-          help=mot(forut and procent(forut["Marginal"]),
-                   "Hur stor del av försäljningen som blir vinst. Pilen visar skillnaden i procentenheter."),
-          chart_data=trend("Marginal"), chart_type="line")
-k4.metric("📦 Ordrar", tal(nu["Ordrar"]),
-          delta=forandring(nu["Ordrar"], forut and forut["Ordrar"]),
-          help=mot(forut and tal(forut["Ordrar"])),
-          chart_data=trend("Ordrar"), chart_type="bar")
-k5.metric("🚚 Frakt per order", pengar_exakt(nu["Frakt"]),
-          delta=forandring(nu["Frakt"], forut and forut["Frakt"]),
-          help=mot(forut and pengar_exakt(forut["Frakt"]), "Vad det kostar i genomsnitt att skicka en order till kunden."),
-          delta_color="inverse",   # för frakt är lägre bättre, så en minskning blir grön
-          chart_data=trend("Frakt"), chart_type="line")
+        hjalp.append(f"⚪ Jämförelseperioden: **{format_(forut[namn])}**")
+    kolumn.metric(etikett, format_(nu[namn]), delta=delta, help="  \n".join(hjalp) or None,
+                  delta_color="inverse" if namn == "Frakt" else "normal",   # lägre frakt är bättre: minskning = grön
+                  chart_data=trend(namn), chart_type=diagram)
 if forut:
     st.caption(f"🔵 {period_text(period)} jämfört med ⚪ {period_text(jamfor_period)}. "
                "Pilen visar förändringen. Håll musen över ⓘ för att se siffran för jämförelseperioden. "
@@ -736,13 +736,15 @@ per_land = df_alla_lander.groupby(["Land", "Landskod", "Region"], as_index=False
 )
 per_land["Marginal (%)"] = per_land["Vinst"] / per_land["Försäljning"] * 100
 
-# Försäljningen i jämförelseperioden för varje land, och hur mycket den har förändrats
+# Försäljningen i jämförelseperioden för varje land, och hur mycket den har förändrats.
+# Texten används i rutan som visas när man håller musen över landet.
+per_land["Förändring (%)"], per_land["Jämförelse"] = float("nan"), ""
 if jmf_alla_lander is not None:
-    innan = jmf_alla_lander.groupby("Landskod")["Total_Sales"].sum()
-    per_land["Jämförelse"] = per_land["Landskod"].map(innan)
-    per_land["Förändring (%)"] = (per_land["Försäljning"] / per_land["Jämförelse"] - 1) * 100
-else:
-    per_land["Jämförelse"] = per_land["Förändring (%)"] = float("nan")
+    innan = per_land["Landskod"].map(jmf_alla_lander.groupby("Landskod")["Total_Sales"].sum())
+    per_land["Förändring (%)"] = (per_land["Försäljning"] / innan - 1) * 100
+    per_land["Jämförelse"] = [f"<br>⚪ Jämförelse: {pengar(i)} ({procent_andring(f)})" if pd.notna(i)
+                              else "<br>⚪ Jämförelse: ingen försäljning"
+                              for i, f in zip(innan, per_land["Förändring (%)"])]
 
 # Förändring visas med två färger: blått = ökning, rött = minskning, grått = oförändrat.
 # Övriga mått visas från mörkblått (lite) till ljusblått (mycket).
@@ -758,14 +760,12 @@ else:
 
 karta = px.choropleth(per_land, locations="Landskod", color=matt, projection="natural earth",
                       custom_data=["Land", "Region", "Försäljning", "Vinst", "Marginal (%)", "Ordrar",
-                                   "Jämförelse", "Förändring (%)"], **farger)
-hover = ("<b>%{customdata[0]}</b> · %{customdata[1]}<br>"
-         "Försäljning: $%{customdata[2]:,.0f}<br>Vinst: $%{customdata[3]:,.0f}<br>"
-         "Marginal: %{customdata[4]:.1f} %<br>Ordrar: %{customdata[5]}")
-if jmf_alla_lander is not None:
-    hover += "<br>⚪ Jämförelse: $%{customdata[6]:,.0f} (%{customdata[7]:+.1f} %)"
+                                   "Jämförelse"], **farger)
 karta.update_traces(marker_line_color="rgba(11,14,20,0.9)", marker_line_width=0.6,
-                    hovertemplate=hover + "<br><i>Klicka för att filtrera</i><extra></extra>")
+                    hovertemplate="<b>%{customdata[0]}</b> · %{customdata[1]}<br>"
+                                  "Försäljning: $%{customdata[2]:,.0f}<br>Vinst: $%{customdata[3]:,.0f}<br>"
+                                  "Marginal: %{customdata[4]:.1f} %<br>Ordrar: %{customdata[5]}%{customdata[6]}"
+                                  "<br><i>Klicka för att filtrera</i><extra></extra>")
 
 # Det valda landet får en tjock vit kant, så att man ser vilket land som är valt
 if valt_land:
@@ -785,11 +785,7 @@ karta.update_layout(margin=dict(l=0, r=0, t=10, b=0), coloraxis_colorbar=dict(
     tickformat=",.0f", tickprefix="$" if matt in ("Försäljning", "Vinst") else "",
     ticksuffix=" %" if "%" in matt else "", tickfont=dict(color=TEXT_SVAG)))
 
-# on_select gör att ett klick på ett land filtrerar hela sidan (se nar_land_klickas ovan)
-karta_nyckel = f"karta_{st.session_state['klick_nr']}"
-st.plotly_chart(karta, width="stretch", theme=None, config={"displayModeBar": False},
-                on_select=partial(nar_land_klickas, karta_nyckel, "location"),
-                selection_mode="points", key=karta_nyckel)
+visa(karta, "karta", nar_land_klickas)   # ett klick på ett land filtrerar hela sidan
 
 
 # ===========================================================================
@@ -804,10 +800,6 @@ rubrik("📈", "Utveckling över tid",
 tid_matt = st.segmented_control("Visa", ["Försäljning", "Vinst", "Ordrar"], default="Försäljning",
                                 key="tid_matt", label_visibility="collapsed") or "Försäljning"
 prefix = "" if tid_matt == "Ordrar" else "$"   # ordrar är antal, inte pengar
-
-MANADER_LANGA = ["januari", "februari", "mars", "april", "maj", "juni",
-                 "juli", "augusti", "september", "oktober", "november", "december"]
-
 
 def steg_text(dag):
     # Hur en punkt beskrivs när man håller musen över den, t.ex. "3 okt 2025" eller "oktober 2025"
@@ -857,7 +849,7 @@ if serie_jmf is not None:
 # 10. ÖVERSIKT: fyra kort som fungerar både för alla länder och för ett valt land
 # ===========================================================================
 
-def jamforelse_staplar(nu_varden, jmf_varden, format_, farg_karta, procentenheter=False, hojd=300):
+def jamforelse_staplar(nu_varden, jmf_varden, format_, farg_karta, som_procentenheter=False, hojd=300):
     # Liggande staplar för t.ex. kundgrupper eller kategorier.
     # Utan jämförelse: en stapel per sak i sin egen färg.
     # Med jämförelse: blå stapel = vald period, grå = jämförelseperioden, och förändringen skrivs ut.
@@ -865,36 +857,30 @@ def jamforelse_staplar(nu_varden, jmf_varden, format_, farg_karta, procentenhete
     if jmf_varden is None:
         fig = px.bar(tabell, x="Nu", y="Namn", orientation="h", color="Namn", color_discrete_map=farg_karta,
                      text=tabell["Nu"].map(format_))
-        fig.update_traces(hovertemplate="%{y}: %{text}<extra></extra>")
-        return liggande_staplar(snygga_till(fig, hojd), tabell, "Nu")
-
-    tabell["Innan"] = tabell["Namn"].map(jmf_varden).fillna(0)
-    if procentenheter:
-        andring = (tabell["Nu"] - tabell["Innan"]).map(lambda v: f"{v:+.1f} %-enh.".replace(".", ",", 1))
+        fig.update_traces(hovertemplate="%{y}: %{text}<extra></extra>", textposition="outside",
+                          cliponaxis=False, showlegend=False, textfont=dict(color=TEXT, size=13))
+        bredd = tabell["Nu"].max() * 1.22   # plats till höger så att talen vid staplarna inte klipps av
     else:
-        andring = ((tabell["Nu"] / tabell["Innan"].where(tabell["Innan"] > 0) - 1) * 100).map(procent_andring)
-    fig = go.Figure()
-    fig.add_trace(go.Bar(y=tabell["Namn"], x=tabell["Innan"], orientation="h", name="Jämförelse",
-                         marker_color=GRA, customdata=tabell["Innan"].map(format_),
-                         hovertemplate="%{y}<br>⚪ Jämförelse: %{customdata}<extra></extra>"))
-    fig.add_trace(go.Bar(y=tabell["Namn"], x=tabell["Nu"], orientation="h", name="Vald period",
-                         marker_color=BLA, text=tabell["Nu"].map(format_) + "  (" + andring.fillna("–") + ")",
-                         textposition="outside", cliponaxis=False, textfont=dict(color=TEXT, size=13),
-                         hovertemplate="%{y}<br>🔵 Vald period: %{text}<extra></extra>"))
+        tabell["Innan"] = tabell["Namn"].map(jmf_varden).fillna(0)
+        if som_procentenheter:
+            andring = (tabell["Nu"] - tabell["Innan"]).map(procentenheter)
+        else:
+            andring = ((tabell["Nu"] / tabell["Innan"].where(tabell["Innan"] > 0) - 1) * 100).map(procent_andring)
+        fig = go.Figure()
+        fig.add_trace(go.Bar(y=tabell["Namn"], x=tabell["Innan"], orientation="h", name="Jämförelse",
+                             marker_color=GRA, customdata=tabell["Innan"].map(format_),
+                             hovertemplate="%{y}<br>⚪ Jämförelse: %{customdata}<extra></extra>"))
+        fig.add_trace(go.Bar(y=tabell["Namn"], x=tabell["Nu"], orientation="h", name="Vald period",
+                             marker_color=BLA, text=tabell["Nu"].map(format_) + "  (" + andring.fillna("–") + ")",
+                             textposition="outside", cliponaxis=False, textfont=dict(color=TEXT, size=13),
+                             hovertemplate="%{y}<br>🔵 Vald period: %{text}<extra></extra>"))
+        fig.update_layout(barmode="group", bargroupgap=0.1, legend=dict(traceorder="reversed"))
+        bredd = max(tabell["Nu"].max(), tabell["Innan"].max()) * 1.9
     snygga_till(fig, hojd)
     fig.update_traces(marker_cornerradius=4)
-    fig.update_layout(barmode="group", bargroupgap=0.1, legend=dict(traceorder="reversed"))
-    fig.update_xaxes(range=[0, max(tabell["Nu"].max(), tabell["Innan"].max()) * 1.9],
-                     showgrid=False, showticklabels=False, title=None)
+    fig.update_xaxes(range=[0, bredd], showgrid=False, showticklabels=False, title=None)
     fig.update_yaxes(showgrid=False, title=None)
     return fig
-
-
-def kort_rubrik(ikon, titel, undertitel):
-    # Rubrik inne i ett kort
-    st.markdown(f'<div class="avsnitt" style="margin-top:4px;font-size:1.1rem">'
-                f'<span class="avsnitt-ikon">{ikon}</span>{titel}</div>'
-                f'<div class="avsnitt-under">{undertitel}</div>', unsafe_allow_html=True)
 
 
 plats = f"i {valt_land}" if valt_land else "i urvalet"
@@ -904,7 +890,8 @@ vanster, hoger = st.columns(2)
 
 # --- Kort 1: Kundgrupper (fråga 1: varför tjänar vi minst på företagskunder?) ---
 with vanster.container(border=True):
-    kort_rubrik("👥", "Kundgrupper", "Vem köper – och vem får stora rabatter? Klicka på en kundgrupp för att filtrera.")
+    rubrik("👥", "Kundgrupper", "Vem köper – och vem får stora rabatter? Klicka på en kundgrupp för att filtrera.",
+           liten=True)
     grupp_matt = st.segmented_control("Visa", ["Försäljning", "Vinstmarginal", "Stor rabatt"],
                                       default="Försäljning", key="grupp_matt",
                                       label_visibility="collapsed") or "Försäljning"
@@ -922,12 +909,9 @@ with vanster.container(border=True):
 
     format_ = pengar if grupp_matt == "Försäljning" else procent
     fig = jamforelse_staplar(per_kundgrupp(df, grupp_matt), per_kundgrupp(jmf, grupp_matt), format_,
-                             KUNDGRUPP_FARG, procentenheter=grupp_matt != "Försäljning")
+                             KUNDGRUPP_FARG, som_procentenheter=grupp_matt != "Försäljning")
     # Klick på en kundgrupp filtrerar hela sidan och ändrar kundgruppsfiltret i panelen
-    grupp_nyckel = f"kundgrupper_{st.session_state['klick_nr']}"
-    st.plotly_chart(fig, width="stretch", theme=None, config={"displayModeBar": False},
-                    on_select=partial(nar_kundgrupp_klickas, grupp_nyckel),
-                    selection_mode="points", key=grupp_nyckel)
+    visa(fig, "kundgrupper", nar_kundgrupp_klickas)
     rabatt = per_kundgrupp(df, "Stor rabatt").sort_values()
     marginal = per_kundgrupp(df, "Vinstmarginal")
     if len(rabatt) > 1:
@@ -936,11 +920,11 @@ with vanster.container(border=True):
 
 # --- Kort 2: Vad köps? (fråga 3) ---
 with hoger.container(border=True):
-    kort_rubrik("🛋️", "Vad köps?", "Hur stor del av försäljningen varje kategori står för.")
+    rubrik("🛋️", "Vad köps?", "Hur stor del av försäljningen varje kategori står för.", liten=True)
     andel_kategori = lambda data: (None if data is None else
                                    data.groupby("Kategori")["Total_Sales"].sum() / data["Total_Sales"].sum() * 100)
     kategorier = andel_kategori(df)
-    visa(jamforelse_staplar(kategorier, andel_kategori(jmf), procent, KATEGORI_FARG, procentenheter=True))
+    visa(jamforelse_staplar(kategorier, andel_kategori(jmf), procent, KATEGORI_FARG, som_procentenheter=True))
     st.markdown(f"💡 Mest säljs **{kategorier.idxmax().lower()}** ({procent(kategorier.max())} av försäljningen), "
                 f"minst **{kategorier.idxmin().lower()}** ({procent(kategorier.min())}).")
 
@@ -948,16 +932,16 @@ vanster, hoger = st.columns(2)
 
 # --- Kort 3: Hur betalar man? (fråga 4) ---
 with vanster.container(border=True):
-    kort_rubrik("💳", "Hur betalar man?", "Hur stor del av ordrarna som betalas på varje sätt.")
+    rubrik("💳", "Hur betalar man?", "Hur stor del av ordrarna som betalas på varje sätt.", liten=True)
     andel_betalsatt = lambda data: None if data is None else data["Betalsätt"].value_counts(normalize=True) * 100
     betalsatt = andel_betalsatt(df)
-    visa(jamforelse_staplar(betalsatt, andel_betalsatt(jmf), procent, BETALSATT_FARG, procentenheter=True))
+    visa(jamforelse_staplar(betalsatt, andel_betalsatt(jmf), procent, BETALSATT_FARG, som_procentenheter=True))
     st.markdown(f"💡 Vanligast är **{betalsatt.idxmax().lower()}** ({procent(betalsatt.max())} av ordrarna).")
 
 # --- Kort 4: Länder – topplista (var säljer vi mest?) ---
 with hoger.container(border=True):
-    kort_rubrik("🏆", "Länder med mest försäljning",
-                "Klicka på ett land här eller på kartan för att filtrera hela sidan.")
+    rubrik("🏆", "Länder med mest försäljning",
+           "Klicka på ett land här eller på kartan för att filtrera hela sidan.", liten=True)
     topp = per_land.sort_values("Försäljning", ascending=False).reset_index(drop=True)
     topp["Plats"] = topp.index + 1
     visas = topp.head(8)
@@ -977,10 +961,7 @@ with hoger.container(border=True):
     snygga_till(fig, 300)
     fig.update_xaxes(range=[0, visas["Försäljning"].max() * 1.3], showgrid=False, showticklabels=False)
     fig.update_yaxes(showgrid=False)
-    lista_nyckel = f"topplista_{st.session_state['klick_nr']}"
-    st.plotly_chart(fig, width="stretch", theme=None, config={"displayModeBar": False},
-                    on_select=partial(nar_land_klickas, lista_nyckel, "y"),
-                    selection_mode="points", key=lista_nyckel)
+    visa(fig, "topplista", nar_land_klickas)
     if valt_land:
         plats_nr = int(topp.loc[topp["Land"] == valt_land, "Plats"].iloc[0])
         st.markdown(f"💡 **{valt_land}** är nummer **{plats_nr}** av {len(topp)} länder i försäljning.")
@@ -1011,9 +992,9 @@ with st.expander("🧪 Tänk om vi gav mindre rabatt? – öppna för att testa 
     # Räkna om varje order: om kunden ingår och rabatten är högre än taket, sänk den till taket
     ny_rabatt = prognos["Discount_Percent"].where(~prognos["Kundgrupp"].isin(tak_grupper),
                                                   prognos["Discount_Percent"].clip(upper=tak))
-    # Ny försäljning = antal × pris × (1 − rabatt). Det vi slipper ge i rabatt blir extra vinst.
-    ny_forsaljning = prognos["Quantity"] * prognos["Unit_Price"] * (1 - ny_rabatt / 100)
-    extra = ny_forsaljning - prognos["Total_Sales"]
+    # Det vi slipper ge i rabatt (antal × pris × sänkt rabatt) blir extra försäljning och lika mycket extra vinst
+    extra = prognos["Quantity"] * prognos["Unit_Price"] * (prognos["Discount_Percent"] - ny_rabatt) / 100
+    ny_forsaljning = prognos["Total_Sales"] + extra
     ny_vinst = prognos["Profit"] + extra
     berorda = int((ny_rabatt < prognos["Discount_Percent"]).sum())
     ny_marginal = ny_vinst.sum() / ny_forsaljning.sum() * 100
@@ -1023,7 +1004,7 @@ with st.expander("🧪 Tänk om vi gav mindre rabatt? – öppna för att testa 
         a.metric("📈 Vinst med rabatttak", pengar(ny_vinst.sum()), delta=f"+{pengar(extra.sum())}",
                  delta_description="mot idag")
         b.metric("🎯 Ny vinstmarginal", procent(ny_marginal),
-                 delta=f"{ny_marginal - prognos_marginal:+.1f} procentenheter".replace(".", ","))
+                 delta=procentenheter(ny_marginal - prognos_marginal))
         c.metric("🧾 Ordrar som påverkas", tal(berorda), help="Ordrar där rabatten var högre än taket")
 
     svarsruta(f"Med max <b>{tak} % rabatt</b> för {', '.join(tak_grupper).lower() or 'ingen kundgrupp'} "
