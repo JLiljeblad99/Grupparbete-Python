@@ -59,7 +59,7 @@ Vi gick igenom alla tre dashboards och tog med de diagram som är tydligast och 
 | [`alya_forsaljning_produkter/`](../alya_forsaljning_produkter/) | Alyosh | **Snabböversikten** "Det viktigaste i urvalet", **försäljning och vinst per år**, **kategorier**, den **klickbara produkttabellen** med produktdetaljer, fliken om **förlustordrar** och **Tänk om: fraktavgift för små ordrar** |
 | [`johan_geografi_kunder_betalning/`](../johan_geografi_kunder_betalning/) | Johan | **Datumväljaren med jämförelse** (som i Google Ads), **världskartan**, **utveckling över tid**, **kundgrupper**, **frakt, produktmix och betalsätt per region**, **klickbara diagram** som ändrar filtren och **Tänk om: tak för rabatten** |
 
-Det mörka färgtemat och utseendet (rubrikrutan, korten och rutorna) kommer från Johans och Alyoshs delar, som redan använde samma stil.
+Det mörka färgtemat och utseendet (korten och rutorna) kommer från Johans och Alyoshs delar, som redan använde samma stil.
 
 ---
 
@@ -69,14 +69,18 @@ Det mörka färgtemat och utseendet (rubrikrutan, korten och rutorna) kommer fr�
 
 - **Datum:** välj period med snabbval (t.ex. *Senaste 90 dagarna* eller *Förra året*) eller i en kalender. Från början visas **hela perioden**.
 - **Jämförelse:** slå på *⚖️ Jämför med en annan period* och välj *föregående period* eller *samma period förra året*. Då visar KPI-korten en pil med förändringen, och diagrammen visar jämförelseperioden i grått.
-- **Filter:** region, land, kundgrupp och kategori. Allt på sidan räknas om direkt.
-- **Filtren och diagrammen hänger ihop:** klickar man på ett land på kartan, en kundgrupp eller en kategori i ett diagram ändras filtret i panelen. Klickar man igen visas alla.
-- **↺ Återställ allt** tar bort alla val.
+- **Filter:** region, land, kundgrupp och kategori. En tom lista betyder att alla ingår, och då står det *Alla regioner*, *Alla länder*, *Alla kundgrupper* och *Alla kategorier*.
+- **✓ Apply:** ändringarna i panelen (datum, jämförelse och filter) börjar gälla först när man klickar på **Apply**. Så länge det finns ändringar som inte gäller än visas en ruta om det, och knappen lyser blått.
+- **Filtren och diagrammen hänger ihop:** klickar man på ett land på kartan, en kundgrupp eller en kategori i ett diagram filtreras sidan **direkt**, och filtret i panelen ändras. Klickar man igen visas alla.
+- **↺ Återställ allt** går tillbaka till hela perioden och alla regioner, länder, kundgrupper och kategorier. Det gäller direkt, utan Apply.
+- **Flikarna:** vald flik syns i adressen (`?flik=…`), så man kan skicka en länk direkt till en viss flik.
 
 ### Överst på sidan
 
-- **Tio KPI-kort** med ett litet trenddiagram i varje kort. Håll musen över ⓘ för att se vad nyckeltalet betyder.
+- **Tio KPI-kort** högst upp på sidan. När man jämför två perioder visar en pil i varje kort hur mycket nyckeltalet har ändrats. Håll musen över ⓘ för att se vad nyckeltalet betyder och siffran för jämförelseperioden.
 - **🔎 Det viktigaste i urvalet:** tre kort med toppar och dalar, t.ex. bästa månaden, största marknaden och produkten som drar in minst vinst.
+
+Alla rutor och KPI-kort som står bredvid varandra är lika stora. Den största rutan i raden bestämmer höjden.
 
 | KPI | Så räknas den |
 |---|---|
@@ -100,7 +104,7 @@ För rabatt, frakt och förlustordrar är det bra när siffran sjunker. Därför
 | 📈 **Försäljning & trender** | Utveckling över tid (försäljning, vinst, marginal eller ordrar) · Försäljning och vinst per år |
 | 🛋️ **Produkter & kategorier** | Kategorier (klickbara) · Topp 10 produkter · Tabell med alla produkter · Utvecklingen för vald produkt |
 | 🌍 **Geografi & kunder** | Världskarta (klickbar) · Länder med mest försäljning (klickbar) · Kundgrupper (klickbara) · Fraktkostnad per region · Vad köps i olika delar av världen? |
-| 💳 **Betalning** | Hur betalar kunderna? · Betalsätt i olika delar av världen |
+| 💳 **Betalning** | Hur betalar kunderna? · Betalsätt i olika delar av världen (ett cirkeldiagram per region) |
 | 🏷️ **Rabatter & förlust** | Vinstmarginal per rabattnivå · Vem får rabatterna? · Förlustordrar per ordervärde · Förlustordrar per kategori · De produkter som har flest förlustordrar |
 | 🧪 **Tänk om …** | Tak för rabatten · Små ordrar betalar sin egen frakt |
 
