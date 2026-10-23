@@ -2,6 +2,8 @@
 
 Grupparbete i Python: analys av `global_ecommerce_sales.csv` (2 000 ordrar, 2023–2025), med en interaktiv dashboard byggd i **Streamlit** och **Plotly**.
 
+👉 **Öppna dashboarden direkt i webbläsaren: [analysprojekt.streamlit.app](https://analysprojekt.streamlit.app)**
+
 **Innehåll**
 
 1. [Kom igång](#-kom-igång)
@@ -28,7 +30,7 @@ Sidan öppnas på http://localhost:8501. Stäng av den med `Ctrl + C` i terminal
 
 - **Mac:** skriv `pip3` i stället för `pip`, och `python3 -m streamlit run dashboard_app.py` om kommandot `streamlit` inte hittas.
 - **Windows:** skriv `py -m pip install -r requirements.txt` och `py -m streamlit run dashboard_app.py`.
-- **Streamlit Cloud:** appens *Main file path* ska vara `dashboard_app.py`.
+- **Streamlit Cloud:** appen ligger på [analysprojekt.streamlit.app](https://analysprojekt.streamlit.app) och uppdateras automatiskt varje gång någon pushar till `main`. I appens inställningar ska *Main file path* vara `dashboard_app.py`.
 
 När du sparar en fil visar Streamlit en ruta uppe till höger. Klicka på **Rerun** för att se ändringen, eller på **Always rerun** så laddas sidan om automatiskt varje gång.
 
