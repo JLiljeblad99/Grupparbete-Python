@@ -2,12 +2,13 @@
 
 Allt bygger på samma data: archive/global_ecommerce_sales.csv (2 000 ordrar, 2023–2025).
 Från varje del har vi tagit de tydligaste diagrammen och de mest användbara funktionerna:
-  - Wissam (wissam_kpi_dashboard):           tio KPI-kort, rabattdiagrammet, en förklaring under
+  - Wissam (KPI-dashboard):                   tio KPI-kort, rabattdiagrammet, en förklaring under
                                              varje diagram, tabell och nedladdning av urvalet
-  - Alyosh (alya_forsaljning_produkter):     försäljning per år, kategorier, produkttabellen,
+  - Alyosh (försäljning & produkter):        försäljning per år, kategorier, produkttabellen,
                                              snabböversikten, förlustordrar och "Tänk om" för frakten
-  - Johan (johan_geografi_kunder_betalning): period + jämförelse, världskartan, kundgrupper, betalsätt,
+  - Johan (geografi, kunder & betalning):    period + jämförelse, världskartan, kundgrupper, betalsätt,
                                              klickbara diagram och "Tänk om" för rabatterna
+(De separata delarna är borttagna men finns kvar i git-historiken.)
 
 Starta så här (från projektmappen):
     pip install -r requirements.txt

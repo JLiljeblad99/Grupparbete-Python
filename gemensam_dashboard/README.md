@@ -53,13 +53,13 @@ Datan anger ingen valuta. Eftersom det är en global webbutik visar vi beloppen 
 
 ## Vad kommer från vem?
 
-Vi gick igenom alla tre dashboards och tog med de diagram som är tydligast och de funktioner som är mest användbara.
+Från början gjorde vi var sin dashboard. Vi gick igenom alla tre och tog med de diagram som är tydligast och de funktioner som är mest användbara. De separata delarna är nu borttagna, men finns kvar i git-historiken.
 
-| Del i projektet | Ansvarig | Det här finns med i den gemensamma dashboarden |
+| Ursprunglig del | Ansvarig | Det här finns med i den gemensamma dashboarden |
 |---|---|---|
-| [`wissam_kpi_dashboard/`](../wissam_kpi_dashboard/) | Wissam | De **tio KPI-korten**, en **förklaring under varje diagram**, diagrammet **Vinstmarginal per rabattnivå** och **tabellen med nedladdning** av urvalet |
-| [`alya_forsaljning_produkter/`](../alya_forsaljning_produkter/) | Alyosh | **Snabböversikten** "Det viktigaste i urvalet", **försäljning och vinst per år**, **kategorier**, den **klickbara produkttabellen** med produktdetaljer, fliken om **förlustordrar** och **Tänk om: fraktavgift för små ordrar** |
-| [`johan_geografi_kunder_betalning/`](../johan_geografi_kunder_betalning/) | Johan | **Datumväljaren med jämförelse** (som i Google Ads), **världskartan**, **utveckling över tid**, **kundgrupper**, **frakt, produktmix och betalsätt per region**, **klickbara diagram** som ändrar filtren och **Tänk om: tak för rabatten** |
+| KPI-dashboard | Wissam | De **tio KPI-korten**, en **förklaring under varje diagram**, diagrammet **Vinstmarginal per rabattnivå** och **tabellen med nedladdning** av urvalet |
+| Försäljning & produkter | Alyosh | **Snabböversikten** "Det viktigaste i urvalet", **försäljning och vinst per år**, **kategorier**, den **klickbara produkttabellen** med produktdetaljer, fliken om **förlustordrar** och **Tänk om: fraktavgift för små ordrar** |
+| Geografi, kunder & betalning | Johan | **Datumväljaren med jämförelse** (som i Google Ads), **världskartan**, **utveckling över tid**, **kundgrupper**, **frakt, produktmix och betalsätt per region**, **klickbara diagram** som ändrar filtren och **Tänk om: tak för rabatten** |
 
 Det mörka färgtemat och utseendet (korten och rutorna) kommer från Johans och Alyoshs delar, som redan använde samma stil.
 

@@ -2,34 +2,16 @@
 
 Grupparbete i Python: analys av `archive/global_ecommerce_sales.csv`.
 
-## Så kör du analysen
+## Så kör du dashboarden
+
+Hela projektet finns samlat i en dashboard: [`gemensam_dashboard/`](gemensam_dashboard/).
 
 ```bash
 pip install -r requirements.txt
-python wissam_kpi_dashboard/kpi_analys.py
+streamlit run gemensam_dashboard/dashboard_app.py
 ```
 
-Skriptet [`kpi_analys.py`](wissam_kpi_dashboard/kpi_analys.py) läser in datan med pandas, räknar ut alla nyckeltal och skriver ut sammanställningarna nedan.
-
-### Interaktiv KPI-dashboard (Wissam)
-
-```bash
-streamlit run wissam_kpi_dashboard/kpi_dashboard_app.py
-```
-
-Mappen [`wissam_kpi_dashboard/`](wissam_kpi_dashboard/) innehåller en dashboard för ledningsgruppen som öppnas i webbläsaren (http://localhost:8501). Den har filter för datum, region, land, kategori, produkt och kundsegment. Tio KPI-kort och diagram räknas om direkt när filtren ändras, och varje diagram har en kort förklaring. Mer information finns i mappens [README](wissam_kpi_dashboard/README.md).
-
-### Geografi, kunder & betalning (Johan)
-
-👉 **Öppna prototypen direkt i webbläsaren: [prototypjohan.streamlit.app](https://prototypjohan.streamlit.app)**
-
-Eller kör den på din egen dator:
-
-```bash
-streamlit run johan_geografi_kunder_betalning/geografi_kunder_betalning_prototyp_app.py
-```
-
-Mappen [`johan_geografi_kunder_betalning/`](johan_geografi_kunder_betalning/) innehåller analysen, en prototyp-dashboard med världskarta och periodjämförelse, och en [README](johan_geografi_kunder_betalning/README.md) som förklarar resultaten.
+Sidan öppnas i webbläsaren på http://localhost:8501. Dashboarden har tio KPI-kort, sex flikar (försäljning, produkter, geografi och kunder, betalning, rabatter och förlust samt "Tänk om"), filter för datum, region, land, kundgrupp och kategori, och en förklaring under varje diagram. Mer information finns i mappens [README](gemensam_dashboard/README.md).
 
 ---
 
@@ -40,6 +22,8 @@ Projektet analyserar en global e-handelsdatamängd med **2 000 ordrar** från **
 **Verktyg och bibliotek:**
 - **Python 3**
 - **pandas**: inläsning, gruppering och beräkning av nyckeltal
+- **Streamlit**: dashboarden i webbläsaren
+- **Plotly**: diagrammen och världskartan
 - **Git och GitHub**: samarbete i teamet
 
 ## 2. Viktiga nyckeltal (KPI:er)
