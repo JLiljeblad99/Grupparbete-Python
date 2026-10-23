@@ -1,0 +1,4 @@
+# Filer som datorn skapar automatiskt och som inte ska in i git
+__pycache__/
+*.pyc
+.DS_Store

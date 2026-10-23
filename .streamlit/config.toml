@@ -1,5 +1,6 @@
-# Gemensamt färgtema för gruppens dashboard (samma som i de enskilda delarna).
+# Färgtemat för dashboarden. Streamlit läser filen automatiskt när appen startas.
 # Mörkt tema med blå detaljer, så att knappar, filter och flikar passar ihop med diagrammens färger.
+# Färgerna i diagrammen och CSS:en ligger i installningar.py – ändrar du en färg här, ändra den där också.
 [theme]
 base = "dark"
 primaryColor = "#3987e5"
