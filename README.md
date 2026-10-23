@@ -4,6 +4,8 @@ Grupparbete i Python: analys av `global_ecommerce_sales.csv` (2 000 ordrar, 2023
 
 👉 **Öppna dashboarden direkt i webbläsaren: [analysprojekt.streamlit.app](https://analysprojekt.streamlit.app)**
 
+Har du laddat ner projektet kan du också dubbelklicka på filen `Dashboard.url`.
+
 **Innehåll**
 
 1. [Kom igång](#-kom-igång)
@@ -62,6 +64,7 @@ Grupparbete-Python/
 │   └── tank_om.py          flik: Tänk om …
 │
 ├── global_ecommerce_sales.csv   datan (läses av data.py)
+├── Dashboard.url           genväg: dubbelklicka för att öppna appen på Streamlit Cloud
 ├── .streamlit/config.toml  färgtemat (mörkt), läses automatiskt av Streamlit
 ├── requirements.txt        paketen som behövs (pandas, streamlit, plotly) – används av Streamlit Cloud
 ├── .gitignore              filer som git ska strunta i (t.ex. __pycache__)
@@ -85,6 +88,7 @@ Grupparbete-Python/
 | [`ui/oversikt.py`](ui/oversikt.py) | Det som står **ovanför och under flikarna**. | Sidrubriken, `KPI_KORT` (de tio korten), snabböversikten, tabellen med nedladdning. | … lägga till eller ändra ett KPI-kort. |
 | [`ui/trender.py`](ui/trender.py) … [`ui/tank_om.py`](ui/tank_om.py) | **En fil per flik.** | En funktion `visa_flik(urval)` som ritar fliken: kort, diagram och förklaringar. | … ändra eller lägga till något i en flik. |
 | [`.streamlit/config.toml`](.streamlit/config.toml) | Streamlits **färgtema** (bakgrund, knappar). | `[theme]` med färgkoder. | … ändra bakgrunds- eller knappfärg. Ändra då samma färg i `installningar.py`. |
+| [`Dashboard.url`](Dashboard.url) | **Genväg** till appen på Streamlit Cloud. | Länken `https://analysprojekt.streamlit.app`. | … appen får en ny adress. |
 | [`requirements.txt`](requirements.txt) | **Paketen** som behövs för att köra appen. | `pandas`, `streamlit`, `plotly`. | … börja använda ett nytt paket. Utan det kraschar appen på Streamlit Cloud. |
 
 ---
